@@ -5,6 +5,11 @@
 body  {
     background-image: url("../assets/images/bg.jpg");
     background-color: var(--base-color);
+<<<<<<< HEAD
+    background-repeat-y: no-repeat;
+    background-repeat-x: no-repeat;
+=======
+>>>>>>> 368aa532fac73eedf630256e367a8c17f6ce22e5
 }
 
 .list, a {
@@ -13,11 +18,19 @@ body  {
 
 a {
     text-decoration: none;
+<<<<<<< HEAD
+    transition: letter-spacing .2s cubic-bezier(0.35, 0.54, 0.43, 0.93);
+}
+
+a:hover {
+    letter-spacing: .2vw;
+=======
     transition: letter-spacing 1s cubic-bezier(0.35, 0.54, 0.43, 0.93);
 }
 
 a:hover {
     letter-spacing: 5vw;
+>>>>>>> 368aa532fac73eedf630256e367a8c17f6ce22e5
     color: #2EAFAC;
     background-color: var(--base-color);
 }
