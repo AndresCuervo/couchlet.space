@@ -1,0 +1,28 @@
+:root {
+    --base-color: #FFF;
+}
+
+body  {
+    background-image: url("../assets/images/bg.jpg");
+    background-color: var(--base-color);
+}
+
+.list, a {
+    color: var(--base-color);
+}
+
+a {
+    text-decoration: none;
+    transition: letter-spacing 1s cubic-bezier(0.35, 0.54, 0.43, 0.93);
+}
+
+a:hover {
+    letter-spacing: 5vw;
+    color: #2EAFAC;
+    background-color: var(--base-color);
+}
+
+body {
+    font-family: "Times New Roman", Times, serif;
+}
+
