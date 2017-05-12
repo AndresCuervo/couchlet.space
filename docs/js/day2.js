@@ -1,7 +1,7 @@
 
 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-var renderer, scene, camera, stats;
+var renderer, scene, camera, stats, effect;
 
 var particleSystem, uniforms, geometry;
 
@@ -9,6 +9,12 @@ var particles = 1000;
 
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
+
+var flashPoints;
+
+var windowHalfX = window.innerWidth / 2;
+var windowHalfY = window.innerHeight / 2;
+document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 init();
 animate();
@@ -33,7 +39,7 @@ function init() {
 
     var g;
     var loader = new THREE.PLYLoader();
-    loader.load( 'assets/models/kinectCloud.ply', function ( geometry ) {
+    loader.load( 'assets/models/moss-garden-cloud-tiny-2.ply', function ( geometry ) {
 
 
 		uniforms = {
@@ -49,19 +55,20 @@ function init() {
 			vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 			fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-			blending:       THREE.AdditiveBlending,
-			depthTest:      false,
-			transparent:    true
+			blending:       THREE.NormalBlending,
+			depthTest:      true,
+			transparent:    true,
+
 
 		});
 
         g = geometry.attributes.position.array;
+		c = geometry.attributes.color.array;
 
-
-
+		console.log(geometry);
         particles = g.length / 3;
 
-		var radius = 200;
+		var radius = 3;
 
 		geometry = new THREE.BufferGeometry();
 
@@ -71,7 +78,7 @@ function init() {
 
 		var color = new THREE.Color();
 
-        var scale = 300;
+        var scale = 800;
         for ( var i = 0; i < positions.length; i += 3 ) {
 
             // positions
@@ -83,13 +90,11 @@ function init() {
             positions[ i + 1 ] = y * scale;
             positions[ i + 2 ] = z * scale;
 
-			color.setHSL( i / particles, 1.0, 1.0 );
+			colors[ i + 0 ] = c[ i ];
+			colors[ i + 1 ] = c[ i + 1];
+			colors[ i + 2 ] = c[ i + 2];
 
-			colors[ i + 0 ] = color.r;
-			colors[ i + 1 ] = color.g;
-			colors[ i + 2 ] = color.b;
-
-			sizes[i/3] = 15;
+			sizes[i/3] = 1;
         }
 
 		geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -101,6 +106,12 @@ function init() {
 		scene.add( particleSystem );
 
 	    geo = geometry;
+		
+
+		var width = window.innerWidth || 2;
+		var height = window.innerHeight || 2;
+		effect = new THREE.AnaglyphEffect( renderer );
+		effect.setSize( width, height )
     } );
 
     renderer = new THREE.WebGLRenderer( { antialias: false } );
@@ -108,7 +119,28 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
 
     container.appendChild( renderer.domElement );
+	
+    var checkbox = document.createElement('input');
+    var checkboxID = "flashPoints"
+                 checkbox.type = "checkbox";
+                 checkbox.name = "flash-points-checkbox";
+                 checkbox.value = flashPoints;
+                 checkbox.id = checkboxID;
+                 checkbox.onclick = function () {
+                     checkbox.value = !flashPoints;
+                     flashPoints = !flashPoints;
+                     points.material.size = 0.5;
+                 };
 
+                 var label = document.createElement('label')
+                 label.htmlFor = checkboxID;
+                 label.appendChild(document.createTextNode('Anaglyph'));
+
+                 checkbox.style = "position: fixed; left: 100px; top: 1%;";
+                 label.style = "position: fixed; left: 120px; top: 1%; color: white;";
+
+                 container.appendChild(checkbox);
+                 container.appendChild(label);
     //
 
     stats = new Stats();
@@ -124,8 +156,17 @@ function onWindowResize() {
 	camera.updateProjectionMatrix();
 
 	renderer.setSize( window.innerWidth, window.innerHeight );
+	
+	effect.setSize( window.innerWidth, window.innerHeight );
+	
 
 }
+
+function onDocumentMouseMove(event) {
+	mouseX = ( event.clientX - windowHalfX ) / 100;
+	mouseY = ( event.clientY - windowHalfY ) / 100;
+}
+
 
 function animate() {
 
@@ -138,25 +179,39 @@ function animate() {
 }
 
 function render() {
+	
+	// var x = event.clientX;
+	// var y = event.clientY;
+	//
+	// console.log(x, y);
 
 	var time = Date.now() * 0.005;
 
+    
 
+	var range = .1;
 	if (!!geo){
 		var sizes = geo.attributes.size.array;
 		var positions = geo.attributes.position.array;
 
 		for ( var i = 0; i < particles; i++ ) {
 
+
 			//sizes[ i ] = 10 * ( 1 + Math.sin(  i + time ) );
-			positions[i*3 + 0] = positions[i*3 + 0] + ((time+positions[i*3+1]*.1) % 5 - 2.5);
+			positions[i*3 + 0] = positions[i*3 + 0] + 
+				((time+positions[i*3+1]*.1) % (range) - (range/2.0));
 
 		}
 
 		geo.attributes.position.needsUpdate = true;
 	}
 
-	renderer.render( scene, camera );
+	if (flashPoints){
+		effect.render( scene, camera );
+	} else {
+		renderer.render( scene, camera );
+	}
+	
 
 }
 
