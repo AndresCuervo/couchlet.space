@@ -9,15 +9,19 @@ var particles = 1000;
 var WIDTH = window.innerWidth;
 var HEIGHT = window.innerHeight;
 
-var flashPoints = { 'on' : false };
+var guiData = {
+    'anaglyphOn' : false,
+    'particleSize' : 1
+};
 
 var windowHalfX = window.innerWidth / 2;
 var windowHalfY = window.innerHeight / 2;
-document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+// document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 init();
 animate();
 
+var g;
 var geo;
 
 function init() {
@@ -25,18 +29,8 @@ function init() {
     camera = new THREE.PerspectiveCamera( 40, WIDTH / HEIGHT, 1, 10000 );
     camera.position.z = 300;
 
-    controls = new THREE.TrackballControls( camera );
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 1.2;
-    controls.panSpeed = 0.8;
-    controls.noZoom = false;
-    controls.noPan = false;
-    controls.staticMoving = true;
-    controls.dynamicDampingFactor = 0.3;
-    controls.keys = [ 65, 83, 68 ];
     scene = new THREE.Scene();
 
-    var g;
     var loader = new THREE.PLYLoader();
     loader.load( 'assets/models/moss-garden-cloud-tiny-2.ply', function ( geometry ) {
 
@@ -93,7 +87,7 @@ function init() {
             colors[ i + 1 ] = c[ i + 1];
             colors[ i + 2 ] = c[ i + 2];
 
-            sizes[i/3] = 1;
+            sizes[i/3] = guiData.particleSize;
         }
 
         geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -113,18 +107,39 @@ function init() {
         effect.setSize( width, height )
     } );
 
+
     renderer = new THREE.WebGLRenderer( { antialias: false } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
-
     container.appendChild( renderer.domElement );
+
+    // Note: controls should be here, AFTER renderer gets declared, so that
+    // it's position normally.
+    //
+    // see: http://stackoverflow.com/a/33359046
+    // -----
+    // Also, this one is p important and has context around mrdoob's intended
+    // use of dat.gui & trackball controls
+    //
+    // https://github.com/mrdoob/three.js/issues/828
+    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+    controls.keys = [ 65, 83, 68 ];
+
 
     stats = new Stats();
     container.appendChild( stats.dom );
 
     window.onload = function() {
         var gui = new dat.GUI();
-        gui.add(flashPoints, 'on');
+        gui.add(guiData, 'anaglyphOn');
+        gui.add(guiData, 'particleSize', 0, 5);
     };
 
     window.addEventListener( 'resize', onWindowResize, false );
@@ -159,15 +174,20 @@ function animate() {
 }
 
 function render() {
-
     // var x = event.clientX;
     // var y = event.clientY;
     //
     // console.log(x, y);
 
     var time = Date.now() * 0.005;
-
-
+    if (!!particleSystem) {
+        var  posits = new Float32Array( particles * 3 );
+        var sizes = new Float32Array( particles );
+        for ( var i = 0; i < posits.length; i += 3 ) {
+            sizes[i/3] = guiData.particleSize;
+        }
+        particleSystem.geometry.attributes.size = new THREE.BufferAttribute( sizes, 1 );
+    }
 
     var range = .1;
     if (!!geo){
@@ -186,7 +206,7 @@ function render() {
         geo.attributes.position.needsUpdate = true;
     }
 
-    if (flashPoints.on){
+    if (guiData.anaglyphOn){
         effect.render( scene, camera );
     } else {
         renderer.render( scene, camera );
