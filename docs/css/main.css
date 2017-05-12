@@ -3,9 +3,12 @@
 }
 
 body  {
-    background-image: url("../assets/images/bg.jpg");
-    background-color: var(--base-color);
-    background-repeat: no-repeat;
+    /* background: url("../assets/images/bg.jpg") center center fixed; */
+    /*     background: url("../assets/images/bg.jpg"); */
+    /*     background-color: var(--base-color); */
+
+    font-family: "Times New Roman", Times, serif;
+    overflow: none;
 }
 
 .list, a {
@@ -18,12 +21,18 @@ a {
 }
 
 a:hover {
-    letter-spacing: .2vw;
+    letter-spacing: 10vw;
     color: #2EAFAC;
     background-color: var(--base-color);
 }
 
-body {
-    font-family: "Times New Roman", Times, serif;
+.bg {
+    z-index: -1;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
-
