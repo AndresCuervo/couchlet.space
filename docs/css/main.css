@@ -5,8 +5,7 @@
 body  {
     background-image: url("../assets/images/bg.jpg");
     background-color: var(--base-color);
-    background-repeat-y: no-repeat;
-    background-repeat-x: no-repeat;
+    background-repeat: no-repeat;
 }
 
 .list, a {

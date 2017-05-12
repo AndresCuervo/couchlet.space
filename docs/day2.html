@@ -4,32 +4,14 @@
         <title>05.11.2017</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-            body {
-                color: #cccccc;
-                font-family:Monospace;
-                font-size:13px;
-                text-align:center;
-
-                background-color: #050505;
-                margin: 0px;
-                overflow: hidden;
-            }
-
-            #info {
-                position: absolute;
-                top: 0px; width: 100%;
-                padding: 5px;
-            }
-
-            a {
-                color: #0080ff;
-            }
-        </style>
+        <link rel="stylesheet" href="css/three.css">
+        <link rel="stylesheet" href="css/dat.gui.css">
     </head>
     <body>
 
-        <div id="container"></div>
+        <div id="container">
+
+        </div>
 
         <script src="js/three.js"></script>
 
@@ -38,48 +20,43 @@
         <script src="js/stats.min.js"></script>
         <script src="js/loaders/PLYLoader.js"></script>
         <script src="js/TrackballControls.js"></script>
-		<script src="js/effects/AnaglyphEffect.js"></script>
+        <script src="js/effects/AnaglyphEffect.js"></script>
+        <!-- From: https://github.com/dataarts/dat.gui -->
+        <script type="text/javascript" src="js/utils/dat.gui.min.js"></script>
 
-			<script type="x-shader/x-vertex" id="vertexshader">
+        <script type="x-shader/x-vertex" id="vertexshader">
+            attribute float size;
+            attribute vec3 customColor;
 
-				attribute float size;
-				attribute vec3 customColor;
+            varying vec3 vColor;
 
-				varying vec3 vColor;
+            void main() {
 
-				void main() {
+                vColor = customColor;
 
-					vColor = customColor;
+                vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-					vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+                gl_PointSize = size * ( 300.0 / -mvPosition.z );
 
-					gl_PointSize = size * ( 300.0 / -mvPosition.z );
+                gl_Position = projectionMatrix * mvPosition;
 
-					gl_Position = projectionMatrix * mvPosition;
+            }
+        </script>
 
-				}
+        <script type="x-shader/x-fragment" id="fragmentshader">
+            uniform vec3 color;
+            uniform sampler2D texture;
 
-			</script>
+            varying vec3 vColor;
 
-			<script type="x-shader/x-fragment" id="fragmentshader">
+            void main() {
 
-				uniform vec3 color;
-				uniform sampler2D texture;
+                gl_FragColor = vec4( color * vColor, 1.0 );
 
-				varying vec3 vColor;
+                gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
 
-				void main() {
-
-					gl_FragColor = vec4( color * vColor, 1.0 );
-
-					gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
-
-				}
-
-			</script>
-
-
-
+            }
+        </script>
         <script src="js/day2.js"></script>
     </body>
 </html>
