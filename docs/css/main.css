@@ -3,16 +3,13 @@
 }
 
 body  {
-    /* background: url("../assets/images/bg.jpg") center center fixed; */
-    /*     background: url("../assets/images/bg.jpg"); */
-    /*     background-color: var(--base-color); */
-
     font-family: "Times New Roman", Times, serif;
-    overflow: none;
+    overflow-y: hidden;
 }
 
 .list, a {
     color: var(--base-color);
+    font-size: 2em;
 }
 
 a {
@@ -21,7 +18,7 @@ a {
 }
 
 a:hover {
-    letter-spacing: 10vw;
+    letter-spacing: .1vw;
     color: #2EAFAC;
     background-color: var(--base-color);
 }
@@ -31,7 +28,6 @@ a:hover {
     margin: 0;
     padding: 0;
     width: 100%;
-    min-height: 100%;
     position: absolute;
     top: 0;
     left: 0;

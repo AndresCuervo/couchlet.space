@@ -111,6 +111,8 @@ function init() {
     renderer = new THREE.WebGLRenderer( { antialias: false } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
+
+    container = document.querySelector('body');
     container.appendChild( renderer.domElement );
 
     // Note: controls should be here, AFTER renderer gets declared, so that
