@@ -1,10 +1,12 @@
 // Global so you can pass em along 😬
 var points, geo, oPositions;
+var colorAvg;
 var flashPoints = false;
 var guiData = {
-    'anaglyphOn' : false,
+    'colorWhite' : true,
     'delta' : 130,
-    'particleSize' : 1
+    'particleSize' : 1,
+    'sinFactor' : 0.01
 };
 AFRAME.registerComponent('make-point-cloud', {
     init: function () {
@@ -76,10 +78,10 @@ AFRAME.registerComponent('make-point-cloud', {
                 normals[ i + 1 ] = c[i + 1];
                 normals[ i + 2 ] = c[i + 2];
 
-                var avg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
-                colors[ i + 0 ] = 1;
-                colors[ i + 1 ] = 1;
-                colors[ i + 2 ] = 1;
+                colorAvg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
+                colors[ i + 0 ] = guiData.colorWhite ? 1 : colorAvg;
+                colors[ i + 1 ] = guiData.colorWhite ? 1 : colorAvg;
+                colors[ i + 2 ] = guiData.colorWhite ? 1 : colorAvg;
 
                 sizes[i/3] = guiData.particleSize;
             }
@@ -97,7 +99,6 @@ AFRAME.registerComponent('make-point-cloud', {
 
             geo = geometry;
 
-
             var width = window.innerWidth || 2;
             var height = window.innerHeight || 2;
             effect = new THREE.AnaglyphEffect( renderer );
@@ -108,37 +109,18 @@ AFRAME.registerComponent('make-point-cloud', {
         renderer = new THREE.WebGLRenderer( { antialias: false } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
-        container.appendChild( renderer.domElement );
 
-        // Note: controls should be here, AFTER renderer gets declared, so that
-        // it's position normally.
-        //
-        // see: http://stackoverflow.com/a/33359046
-        // -----
-        // Also, this one is p important and has context around mrdoob's intended
-        // use of dat.gui & trackball controls
-        //
-        // https://github.com/mrdoob/three.js/issues/828
-        // controls = new THREE.TrackballControls(renderer.domElement);
-        // controls.rotateSpeed = 1.0;
-        // controls.zoomSpeed = 1.2;
-        // controls.panSpeed = 0.8;
-        // controls.noZoom = false;
-        // controls.noPan = false;
-        // controls.staticMoving = true;
-        // controls.dynamicDampingFactor = 0.3;
-        // controls.keys = [ 65, 83, 68 ];
-
+        var container = document.querySelector('body');
+        // container.appendChild( renderer.domElement );
 
         stats = new Stats();
         container.appendChild( stats.dom );
 
-        window.onload = function() {
-            var gui = new dat.GUI();
-            gui.add(guiData, 'anaglyphOn');
-            gui.add(guiData, 'delta', 0, 1000);
-            gui.add(guiData, 'particleSize', 0, 10);
-        };
+        var gui = new dat.GUI();
+        gui.add(guiData, 'colorWhite');
+        gui.add(guiData, 'delta', 0, 1000);
+        gui.add(guiData, 'particleSize', 0, 10);
+        gui.add(guiData, 'sinFactor', 0, 0.1);
 
         // window.addEventListener( 'resize', onWindowResize, false );
 
@@ -155,13 +137,12 @@ AFRAME.registerComponent('make-point-cloud', {
             var time = document.querySelector('a-scene').time * 0.001;
             var camDirection = document.querySelector('a-camera').object3D.getWorldDirection();
 
-            var scale = guiData.delta;
-
             var range = .1;
             if (!!geo){
                 var sizes = geo.attributes.size.array;
                 var positions = geo.attributes.position.array;
                 var normals =   geo.attributes.normal.array;
+                var colors =   geo.attributes.customColor.array;
 
                 for ( var i = 0; i < particles; i++ ) {
                     var x = positions[i*3];
@@ -173,11 +154,17 @@ AFRAME.registerComponent('make-point-cloud', {
 
                     var dot = camDirection.x * nx + camDirection.y * ny + camDirection.z * nz;
                     // dot *= scale;
-                    dot *= guiData.delta * Math.sin(y * .01 + time);
+                    dot *= guiData.delta * Math.sin(y * guiData.sinFactor + time);
 
                     positions[i*3 + 0] = oPositions[i*3 + 0] + dot * nx;
                     positions[i*3 + 1] = oPositions[i*3 + 1] + dot * ny;
                     positions[i*3 + 2] = oPositions[i*3 + 2] + dot * nz;
+
+
+                    colorAvg = (normals[ i ] + normals[ i + 1] + normals[ i + 2]) / 3;
+                    colors[i*3 + 0] = guiData.colorWhite ? 1 : colorAvg;
+                    colors[i*3 + 1] = guiData.colorWhite ? 1 : colorAvg;
+                    colors[i*3 + 1] = guiData.colorWhite ? 1 : colorAvg;
 
                     sizes[ i ] = guiData.particleSize;
                     // positions[i*3 + 0] = positions[i*3 + 0] +
@@ -186,10 +173,11 @@ AFRAME.registerComponent('make-point-cloud', {
                 }
 
                 geo.attributes.position.needsUpdate = true;
+                geo.attributes.customColor.needsUpdate = true;
                 geo.attributes.size.needsUpdate = true;
             }
         }
 
-        document.querySelector('.a-enter-vr-button').click();
+        // document.querySelector('.a-enter-vr-button').click();
     }
 });
