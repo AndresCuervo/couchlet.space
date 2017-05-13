@@ -12,6 +12,10 @@ body  {
     font-size: 2em;
 }
 
+.list {
+    list-style: none;
+}
+
 a {
     text-decoration: none;
     transition: letter-spacing .2s cubic-bezier(0.35, 0.54, 0.43, 0.93);

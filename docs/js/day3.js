@@ -1,111 +1,9 @@
-/*
-if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-var renderer, scene, camera, stats, effect;
-
-var particleSystem, uniforms, geometry;
-
-var particles = 1000;
-
-var WIDTH = window.innerWidth;
-var HEIGHT = window.innerHeight;
-
-var guiData = {
-    'anaglyphOn' : false,
-    'particleSize' : 1
-};
-
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
-// document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-init();
-animate();
-
-var g;
-var geo;
-
-function init() {
-
-}
-
-function onWindowResize() {
-
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
-    effect.setSize( window.innerWidth, window.innerHeight );
-
-
-}
-
-function onDocumentMouseMove(event) {
-    mouseX = ( event.clientX - windowHalfX ) / 100;
-    mouseY = ( event.clientY - windowHalfY ) / 100;
-}
-
-
-function animate() {
-
-    requestAnimationFrame( animate );
-
-    render();
-    stats.update();
-    controls.update();
-
-}
-
-function render() {
-    // var x = event.clientX;
-    // var y = event.clientY;
-    //
-    // console.log(x, y);
-
-    var time = Date.now() * 0.005;
-    if (!!particleSystem) {
-        var  posits = new Float32Array( particles * 3 );
-        var sizes = new Float32Array( particles );
-        for ( var i = 0; i < posits.length; i += 3 ) {
-            sizes[i/3] = guiData.particleSize;
-        }
-        particleSystem.geometry.attributes.size = new THREE.BufferAttribute( sizes, 1 );
-    }
-
-    var range = .1;
-    if (!!geo){
-        var sizes = geo.attributes.size.array;
-        var positions = geo.attributes.position.array;
-
-        for ( var i = 0; i < particles; i++ ) {
-
-
-            //sizes[ i ] = 10 * ( 1 + Math.sin(  i + time ) );
-            positions[i*3 + 0] = positions[i*3 + 0] +
-                ((time+positions[i*3+1]*.1) % (range) - (range/2.0));
-
-        }
-
-        geo.attributes.position.needsUpdate = true;
-    }
-
-    if (guiData.anaglyphOn){
-        effect.render( scene, camera );
-    } else {
-        renderer.render( scene, camera );
-    }
-
-
-}
-
-*/
-
-// Global points so you can inspect 😬
-var points;
+// Global so you can pass em along 😬
+var points, geo, oPositions;
 var flashPoints = false;
 var guiData = {
     'anaglyphOn' : false,
+    'delta' : 130,
     'particleSize' : 1
 };
 AFRAME.registerComponent('make-point-cloud', {
@@ -143,6 +41,7 @@ AFRAME.registerComponent('make-point-cloud', {
             });
 
             g = geometry.attributes.position.array;
+
             c = geometry.attributes.normal.array;
 
             console.log(geometry);
@@ -154,11 +53,13 @@ AFRAME.registerComponent('make-point-cloud', {
 
             var positions = new Float32Array( particles * 3 );
             var colors = new Float32Array( particles * 3 );
+            var normals=  new Float32Array( particles * 3);
             var sizes = new Float32Array( particles );
 
             var color = new THREE.Color();
 
             var scale = 800;
+
             for ( var i = 0; i < positions.length; i += 3 ) {
 
                 // positions
@@ -170,14 +71,23 @@ AFRAME.registerComponent('make-point-cloud', {
                 positions[ i + 1 ] = y * scale;
                 positions[ i + 2 ] = z * scale;
 
-                colors[ i + 0 ] = c[ i ];
-                colors[ i + 1 ] = c[ i + 1];
-                colors[ i + 2 ] = c[ i + 2];
+
+                normals[ i ]     = c[i + 0];
+                normals[ i + 1 ] = c[i + 1];
+                normals[ i + 2 ] = c[i + 2];
+
+                var avg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
+                colors[ i + 0 ] = 1;
+                colors[ i + 1 ] = 1;
+                colors[ i + 2 ] = 1;
 
                 sizes[i/3] = guiData.particleSize;
             }
 
+            oPositions = positions.slice();
+
             geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+            geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
             geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
             geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
@@ -226,7 +136,8 @@ AFRAME.registerComponent('make-point-cloud', {
         window.onload = function() {
             var gui = new dat.GUI();
             gui.add(guiData, 'anaglyphOn');
-            gui.add(guiData, 'particleSize', 0, 5);
+            gui.add(guiData, 'delta', 0, 1000);
+            gui.add(guiData, 'particleSize', 0, 10);
         };
 
         // window.addEventListener( 'resize', onWindowResize, false );
@@ -234,24 +145,51 @@ AFRAME.registerComponent('make-point-cloud', {
         function animate() {
             // console.log("hello");
             requestAnimationFrame( animate );
-            // render();
+            render();
             if (stats) {
             stats.update();
             }
         }
 
         function render() {
-            if (!!points) {
-                var time = document.querySelector('a-scene').time * 0.001;
-                // points.rotation.x = time * 0.025;
-                points.rotation.y = time * 0.05;
-                if (flashPoints) {
-                    points.material.size = time % 0.5;
-                }
-                // points.position.x = time * 0.5;
+            var time = document.querySelector('a-scene').time * 0.001;
+            var camDirection = document.querySelector('a-camera').object3D.getWorldDirection();
 
-                // renderer.render( scene, camera );
+            var scale = guiData.delta;
+
+            var range = .1;
+            if (!!geo){
+                var sizes = geo.attributes.size.array;
+                var positions = geo.attributes.position.array;
+                var normals =   geo.attributes.normal.array;
+
+                for ( var i = 0; i < particles; i++ ) {
+                    var x = positions[i*3];
+                    var y = positions[i*3 + 1];
+                    var z = positions[i*3 + 2];
+                    var nx = normals[i*3];
+                    var ny = normals[i*3 + 1];
+                    var nz = normals[i*3 + 2];
+
+                    var dot = camDirection.x * nx + camDirection.y * ny + camDirection.z * nz;
+                    // dot *= scale;
+                    dot *= guiData.delta * Math.sin(y * .01 + time);
+
+                    positions[i*3 + 0] = oPositions[i*3 + 0] + dot * nx;
+                    positions[i*3 + 1] = oPositions[i*3 + 1] + dot * ny;
+                    positions[i*3 + 2] = oPositions[i*3 + 2] + dot * nz;
+
+                    sizes[ i ] = guiData.particleSize;
+                    // positions[i*3 + 0] = positions[i*3 + 0] +
+                    //     ((time+positions[i*3+1]*.1) % (range) - (range/2.0));
+
+                }
+
+                geo.attributes.position.needsUpdate = true;
+                geo.attributes.size.needsUpdate = true;
             }
         }
+
+        document.querySelector('.a-enter-vr-button').click();
     }
 });
