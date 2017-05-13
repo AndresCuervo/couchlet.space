@@ -4,7 +4,6 @@
 
 body  {
     font-family: "Times New Roman", Times, serif;
-    overflow-y: hidden;
 }
 
 .list, a {
@@ -14,6 +13,20 @@ body  {
 
 .list {
     list-style: none;
+    overflow: scroll;
+}
+
+.list li a::before {
+    display: inline-block;
+    content: "☛ ";
+    line-height: 1em;
+    padding-right: 0.4em;
+}
+
+.list li a:hover::before {
+    display: inline-block;
+    content: "☞ ";
+    padding-right: 0.4em;
 }
 
 a {
@@ -32,7 +45,7 @@ a:hover {
     margin: 0;
     padding: 0;
     width: 100%;
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
 }
