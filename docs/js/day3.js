@@ -4,6 +4,7 @@ var colorAvg;
 var flashPoints = false;
 var guiData = {
     'colorWhite' : true,
+    'moreCam' : false,
     'delta' : 130,
     'particleSize' : 1,
     'sinFactor' : 0.01
@@ -118,6 +119,7 @@ AFRAME.registerComponent('make-point-cloud', {
 
         var gui = new dat.GUI();
         gui.add(guiData, 'colorWhite');
+        gui.add(guiData, 'moreCam');
         gui.add(guiData, 'delta', 0, 1000);
         gui.add(guiData, 'particleSize', 0, 10);
         gui.add(guiData, 'sinFactor', 0, 0.1);
@@ -154,7 +156,11 @@ AFRAME.registerComponent('make-point-cloud', {
 
                     var dot = camDirection.x * nx + camDirection.y * ny + camDirection.z * nz;
                     // dot *= scale;
-                    dot *= guiData.delta * Math.sin(y * guiData.sinFactor + time);
+                    if (guiData.moreCam) {
+                        dot *= guiData.delta * Math.sin(y * (camDirection.x * guiData.sinFactor) + time);
+                    } else {
+                        dot *= guiData.delta * Math.sin(y * guiData.sinFactor + time);
+                    }
 
                     positions[i*3 + 0] = oPositions[i*3 + 0] + dot * nx;
                     positions[i*3 + 1] = oPositions[i*3 + 1] + dot * ny;
@@ -177,7 +183,5 @@ AFRAME.registerComponent('make-point-cloud', {
                 geo.attributes.size.needsUpdate = true;
             }
         }
-
-        // document.querySelector('.a-enter-vr-button').click();
     }
 });
