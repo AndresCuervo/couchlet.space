@@ -1,115 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>hdge⎋hog</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-		body {
-			color: #ffffff;
-			font-family: Monospace;
-			font-size: 13px;
-			text-align: center;
-			font-weight: bold;
-			background-color: #000000;
-			margin: 0px;
-			overflow: hidden;
-		}
+    <head>
+        <title>hdge⎋hog</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="css/three.css">
+        <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    </head>
+    <body>
 
-		#info {
-			position: absolute;
-			top: 0px;
-			width: 100%;
-			padding: 5px;
-		}
+        <div id="container"></div>
+        <div id="info">
+            <a href="http://threejs.org" target="_blank">three.js</a> - instancing demo (single triangle)
+            <div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+        </div>
 
-		a {
-			color: #ffffff;
-		}
+        <script src="js/utils/dat.gui.min.js"></script>
+        <script src="js/three.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="js/stats.min.js"></script> <!-- TODO move this in future -->
+        <script src="js/loaders/PLYLoader.js"></script>
+        <script src="js/effects/StereoEffect.js"></script>
 
-		#oldie a {
-			color: #da0;
-		}
+        <script id="vertexShader" type="x-shader/x-vertex">
+            precision highp float;
 
-		#notSupported {
-			width: 50%;
-			margin: auto;
-			border: 2px red solid;
-			margin-top: 20px;
-			padding: 10px;
-		}
-	</style>
-</head>
-<body>
+            uniform float sineTime;
+            uniform float range;
 
-	<div id="container"></div>
-	<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> - instancing demo (single triangle)
-		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
-	</div>
+            uniform mat4 modelViewMatrix;
+            uniform mat4 projectionMatrix;
 
-	<script src="js/utils/dat.gui.min.js"></script>
-	<script src="js/three.js"></script>
-	<script src="js/Detector.js"></script>
-	<script src="js/stats.min.js"></script> <!-- TODO move this in future -->
-	<script src="js/loaders/PLYLoader.js"></script>
-	<script src="js/effects/StereoEffect.js"></script>
+            attribute vec3 position;
+            attribute vec3 offset;
+            attribute vec4 color;
+            attribute vec4 orientationStart;
+            attribute vec4 orientationEnd;
 
-	<script id="vertexShader" type="x-shader/x-vertex">
-		precision highp float;
+            varying vec3 vPosition;
+            varying vec4 vColor;
 
-		uniform float sineTime;
-		uniform float range;
+            void main(){
+                vPosition = offset + range * position;
+                vec4 orientation = mix(vec4(offset,1), normalize(orientationStart),range);
+                vec3 vcV = cross(orientation.xyz, vPosition);
+                vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
 
-		uniform mat4 modelViewMatrix;
-		uniform mat4 projectionMatrix;
+                vColor = color;
 
-		attribute vec3 position;
-		attribute vec3 offset;
-		attribute vec4 color;
-		attribute vec4 orientationStart;
-		attribute vec4 orientationEnd;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
 
-		varying vec3 vPosition;
-		varying vec4 vColor;
+            }
 
-		void main(){
-			vPosition = offset + range * position;
-			vec4 orientation = mix(vec4(offset,1), normalize(orientationStart),range);
-			vec3 vcV = cross(orientation.xyz, vPosition);
-			vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
+        </script>
 
-			vColor = color;
+        <script id="fragmentShader" type="x-shader/x-fragment">
 
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
+            precision highp float;
 
-		}
+            uniform float time;
 
-	</script>
+            varying vec3 vPosition;
+            varying vec4 vColor;
 
-	<script id="fragmentShader" type="x-shader/x-fragment">
+            void main() {
 
-		precision highp float;
+                vec4 color = vec4( vColor );
+                //color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
 
-		uniform float time;
+                gl_FragColor = color;
+            }
+        </script>
 
-		varying vec3 vPosition;
-		varying vec4 vColor;
+        <script src="js/day4.js"></script>
 
-		void main() {
-
-			vec4 color = vec4( vColor );
-			//color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
-
-			gl_FragColor = color;
-
-		}
-
-	</script>
-
-	<script src="js/day4.js"></script>
-
-	</body>
+    </body>
 
 </html>
 
