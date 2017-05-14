@@ -9,6 +9,7 @@ var guiData = {
     'particleSize' : 1,
     'sinFactor' : 0.01
 };
+
 AFRAME.registerComponent('make-point-cloud', {
     init: function () {
 
@@ -21,15 +22,10 @@ AFRAME.registerComponent('make-point-cloud', {
         var scene = document.querySelector('a-scene').object3D
         var loader = new THREE.PLYLoader();
         loader.load( 'assets/models/apse-simple.ply', function ( geometry ) {
-
-
             uniforms = {
-
                 color:     { value: new THREE.Color( 0xffffff ) },
                 texture:   { value: new THREE.TextureLoader().load( "textures/spark.png" ) }
-
             };
-
             var shaderMaterial = new THREE.ShaderMaterial( {
 
                 uniforms:       uniforms,
