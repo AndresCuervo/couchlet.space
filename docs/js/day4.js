@@ -1,30 +1,29 @@
-
 if ( !Detector.webgl ) Detector.addGetWebGLMessage();
 
 var container, stats;
 var geometry;
 var camera, scene, renderer, effect;
 
-init();
-animate();
+var gui = new dat.GUI();
 
 var guiData = {
-	'stereo' : false,
-    'range' : 1,
-    'maxInstancedCount' : 0
+    'stereo' : false,
+    'range' : 1
 };
 
+gui.add( guiData, "stereo");
+gui.add( guiData, "range", 0, 1 );
 
 function init() {
-	container = document.getElementById( 'container' );
-	camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
-	camera.position.z = 2;
+    container = document.getElementById( 'container' );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
+    camera.position.z = 2;
 
-	scene = new THREE.Scene();
+    scene = new THREE.Scene();
 
-	// geometry
+    // geometry
 
-	var loader = new THREE.PLYLoader();
+    var loader = new THREE.PLYLoader();
     loader.load( 'assets/models/apse-simple.ply', function ( plyLoader ) {
 
         loaderPositions = plyLoader.attributes.position.array;
@@ -41,158 +40,155 @@ function init() {
 
         var scale = 800;
 
-		var triangles = 1;
-		var instances = particles;
+        var triangles = 1;
+        var instances = particles;
 
-		geometry = new THREE.InstancedBufferGeometry();
+        geometry = new THREE.InstancedBufferGeometry();
 
-		geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
-		var gui = new dat.GUI();
-				gui.add( guiData, "stereo");
-		gui.add( guiData, "range", 0, 1 );
-		gui.add( geometry, "maxInstancedCount", 0, instances );
-		//gui.add( range, "maxInstancedCount", 0, instances );
+        geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
+        gui.add( geometry, "maxInstancedCount", 0, instances ).listen();
+        //gui.add( range, "maxInstancedCount", 0, instances );
 
-		var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
+        var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
 
-		vertices.setXYZ( 0, 0.0005, -.001, 0 );
-		vertices.setXYZ( 1, -0.001, 0.001, 0 );
-		vertices.setXYZ( 2, 0, 0, 0.1 );
+        vertices.setXYZ( 0, 0.0005, -.001, 0 );
+        vertices.setXYZ( 1, -0.001, 0.001, 0 );
+        vertices.setXYZ( 2, 0, 0, 0.1 );
 
-		geometry.addAttribute( 'position', vertices );
+        geometry.addAttribute( 'position', vertices );
 
-		var scale = 1.0;
-		var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );
-		for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
+        var scale = 1.0;
+        var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );
+        for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
             var x = loaderPositions[i*3]   * scale;
             var y = loaderPositions[i*3+1] * scale;
             var z = loaderPositions[i*3+2] * scale;
-			offsets.setXYZ( i, x, y, z);
-		}
+            offsets.setXYZ( i, x, y, z);
+        }
 
-		geometry.addAttribute( 'offset', offsets );
+        geometry.addAttribute( 'offset', offsets );
 
-		var colors = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
-		for ( var i = 0, ul = colors.count; i < ul; i++ ) {
+        var colors = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
+        for ( var i = 0, ul = colors.count; i < ul; i++ ) {
 
-			colors.setXYZW(i, 1,1,1,.4);
+            colors.setXYZW(i, 1,1,1,.4);
 
-		}
-		geometry.addAttribute( 'color', colors );
+        }
+        geometry.addAttribute( 'color', colors );
 
 
-		var vector = new THREE.Vector4();
-		var range = guiData.range;
+        var vector = new THREE.Vector4();
+        var range = guiData.range;
 
-		var orientationsStart = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
-		for ( var i = 0, ul = orientationsStart.count; i < ul; i++ ) {
+        var orientationsStart = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
+        for ( var i = 0, ul = orientationsStart.count; i < ul; i++ ) {
 
             var x = loaderPositions[i*3]   * scale;
             var y = loaderPositions[i*3+1] * scale;
             var z = loaderPositions[i*3+2] * scale;
-			vector.set(x, y, z,1);
+            vector.set(x, y, z,1);
 
-			vector.set(	x - range * Math.random() - (range/2.0),
-						y - range * Math.random() - (range/2.0),
-						z - range * Math.random() - (range/2.0),
-						1.0 - range * Math.random() - (range/2.0));
+            vector.set(	x - range * Math.random() - (range/2.0),
+                y - range * Math.random() - (range/2.0),
+                z - range * Math.random() - (range/2.0),
+                1.0 - range * Math.random() - (range/2.0));
 
-			vector.normalize();
+            vector.normalize();
 
-			orientationsStart.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
+            orientationsStart.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
 
-		}
-		geometry.addAttribute( 'orientationStart', orientationsStart );
+        }
+        geometry.addAttribute( 'orientationStart', orientationsStart );
 
-		var orientationsEnd = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
-		for ( var i = 0, ul = orientationsEnd.count; i < ul; i++ ) {
+        var orientationsEnd = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
+        for ( var i = 0, ul = orientationsEnd.count; i < ul; i++ ) {
 
-			vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-			vector.normalize();
+            vector.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+            vector.normalize();
 
-			orientationsEnd.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
+            orientationsEnd.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
 
-		}
-		geometry.addAttribute( 'orientationEnd', orientationsEnd );
+        }
+        geometry.addAttribute( 'orientationEnd', orientationsEnd );
 
 
-		// tranfer variables from the plyLoader to the buffer instance
+        // tranfer variables from the plyLoader to the buffer instance
         // for ( var i = 0; i < positions.length; i += 3 ) {
 
-            // // positions
-            // var x = g[i];
-            // var y = g[i+1];
-            // var z = g[i+2];
-            //
-            // positions[ i ]     = x * scale;
-            // positions[ i + 1 ] = y * scale;
-            // positions[ i + 2 ] = z * scale;
-            //
-            //
-            // normals[ i ]     = c[i + 0];
-            // normals[ i + 1 ] = c[i + 1];
-            // normals[ i + 2 ] = c[i + 2];
-            //
-            // colorAvg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
-            // colors[ i + 0 ] = guiData.colorWhite ? 1 : colorAvg;
-            // colors[ i + 1 ] = guiData.colorWhite ? 1 : colorAvg;
-            // colors[ i + 2 ] = guiData.colorWhite ? 1 : colorAvg;
+        // // positions
+        // var x = g[i];
+        // var y = g[i+1];
+        // var z = g[i+2];
+        //
+        // positions[ i ]     = x * scale;
+        // positions[ i + 1 ] = y * scale;
+        // positions[ i + 2 ] = z * scale;
+        //
+        //
+        // normals[ i ]     = c[i + 0];
+        // normals[ i + 1 ] = c[i + 1];
+        // normals[ i + 2 ] = c[i + 2];
+        //
+        // colorAvg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
+        // colors[ i + 0 ] = guiData.colorWhite ? 1 : colorAvg;
+        // colors[ i + 1 ] = guiData.colorWhite ? 1 : colorAvg;
+        // colors[ i + 2 ] = guiData.colorWhite ? 1 : colorAvg;
 
-            // sizes[i/3] = guiData.particleSize;
+        // sizes[i/3] = guiData.particleSize;
         // }
 
 
-		// material
+        // material
 
-		var material = new THREE.RawShaderMaterial( {
+        var material = new THREE.RawShaderMaterial( {
 
-			uniforms: {
-				time: { value: 1.0 },
-				sineTime: { value: 1.0 },
-				range: {value: 1.0}
-			},
-			vertexShader: document.getElementById( 'vertexShader' ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-			side: THREE.DoubleSide,
-			transparent: true
+            uniforms: {
+                time: { value: 1.0 },
+                sineTime: { value: 1.0 },
+                range: {value: 1.0}
+            },
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+            side: THREE.DoubleSide,
+            transparent: true
 
-		} );
+        } );
 
-		var mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
+        var mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
 
+        geometry.maxInstancedCount = Math.min(100000, geometry.maxInstancedCount);
     } );
 
 
-	renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer();
 
-	if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
-		document.getElementById( "notSupported" ).style.display = "";
-		return;
-	}
+    if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+        document.getElementById( "notSupported" ).style.display = "";
+        return;
+    }
 
-	renderer.setClearColor( 0x101010 );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container.appendChild( renderer.domElement );
+    renderer.setClearColor( 0x101010 );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    container.appendChild( renderer.domElement );
 
 
-	effect = new THREE.StereoEffect( renderer );
-	effect.setSize( window.innerWidth, window.innerHeight );
+    effect = new THREE.StereoEffect( renderer );
+    effect.setSize( window.innerWidth, window.innerHeight );
 
-	stats = new Stats();
-	container.appendChild( stats.dom );
+    stats = new Stats();
+    container.appendChild( stats.dom );
 
-	window.addEventListener( 'resize', onWindowResize, false );
-
+    window.addEventListener( 'resize', onWindowResize, false );
 }
 
 function onWindowResize( event ) {
 
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
-	renderer.setSize( window.innerWidth, window.innerHeight );
+    renderer.setSize( window.innerWidth, window.innerHeight );
 
 }
 
@@ -200,36 +196,38 @@ function onWindowResize( event ) {
 
 function animate() {
 
-	requestAnimationFrame( animate );
+    requestAnimationFrame( animate );
 
-	render();
-	stats.update();
+    render();
+    stats.update();
 
 }
 
 function render() {
-	var time = performance.now();
-	var object = scene.children[0];
+    var time = performance.now();
+    var object = scene.children[0];
 
 
 
-	if (!!object){
-		guiData.range = Math.sin(time*.001);
+    if (!!object){
+        guiData.range = Math.sin(time*.001);
 
+        object.rotation.y = time * 0.005;
+        object.material.uniforms.time.value = time * 0.005;
+        object.material.uniforms.range.value = guiData.range;
+        object.material.uniforms.sineTime.value = Math.sin( object.material.uniforms.time.value * 0.05 );
 
-		object.rotation.y = time * 0.005;
-		object.material.uniforms.time.value = time * 0.005;
-		object.material.uniforms.range.value = guiData.range;
-		object.material.uniforms.sineTime.value = Math.sin( object.material.uniforms.time.value * 0.05 );
-
-		if (guiData.stereo) {
-			effect.render( scene, camera );
-		} else {
+        if (guiData.stereo) {
+            effect.render( scene, camera );
+        } else {
             renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.render( scene, camera );
-		}
+            renderer.render( scene, camera );
+        }
 
-	}
+    }
 
 }
 
+
+init();
+animate();
