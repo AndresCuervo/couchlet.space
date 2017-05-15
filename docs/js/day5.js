@@ -3,6 +3,7 @@ if ( !Detector.webgl ) Detector.addGetWebGLMessage();
 var container, stats;
 var geometry;
 var camera, scene, renderer, effect;
+var hemiLight, dirLight;
 
 var ourMesh;
 
@@ -32,9 +33,7 @@ function createGeometry() {
     var triangles = 36;
     var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
 
-
-    var s = 0.01;
-
+    var s = 0.001;
     vertices.setXYZ(0, -s,-s,-s);
     vertices.setXYZ(1, -s,-s, s);
     vertices.setXYZ(2, -s, s, s);
@@ -78,6 +77,7 @@ function createGeometry() {
 function loaderGuts ( plyLoader ) {
     loaderPositions = plyLoader.attributes.position.array;
     loaderNormals = plyLoader.attributes.normal.array;
+    loaderColors = plyLoader.attributes.color.array;
 
     particles = loaderPositions.length / 3;
 
@@ -86,8 +86,6 @@ function loaderGuts ( plyLoader ) {
     plyLoader = new THREE.BufferGeometry();
 
     var color = new THREE.Color();
-
-    var scale = 800;
 
     var instances = particles;
 
@@ -100,7 +98,7 @@ function loaderGuts ( plyLoader ) {
 
     geometry.addAttribute( 'position', vertices );
 
-    var scale = 1.0;
+    var scale = 500.0;
     var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );
     for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
         var x = loaderPositions[i*3]   * scale;
@@ -111,10 +109,12 @@ function loaderGuts ( plyLoader ) {
 
     geometry.addAttribute( 'offset', offsets );
 
+
+    // colorAvg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
     var colors = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
     for ( var i = 0, ul = colors.count; i < ul; i++ ) {
 
-        colors.setXYZW(i, 1,1,1,.4);
+        colors.setXYZW(i, loaderColors[i*3], loaderColors[i*3 + 1], loaderColors[i*3 + 2]);
 
     }
     geometry.addAttribute( 'color', colors );
@@ -190,16 +190,18 @@ function loaderGuts ( plyLoader ) {
         fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
         // side: THREE.DoubleSide,
         // lights: true,
-        transparent: true
+        transparent: false
 
     } );
 
     // addPhongSphere(scene);
-    addSpheres(scene);
+    // addSpheres(scene);
 
     ourMesh = new THREE.Mesh( geometry, material );
     ourMesh.castShadow = true;
     ourMesh.receiveShadow = true;
+    ourMesh.rotation.y = 135;
+    // ourMesh.rotation.z = 90;
     scene.add( ourMesh );
 
     geometry.maxInstancedCount = Math.min(100000, geometry.maxInstancedCount);
@@ -210,9 +212,9 @@ function addSpheres(scene) {
 
     var materials = [];
 
-    var cubeWidth = 20;
-    var numberOfSphersPerSide = 5;
-    var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
+    var cubeWidth = 40;
+    var numberOfSphersPerSide = 25;
+    var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) ;
     var stepSize = 1.0 / numberOfSphersPerSide;
 
     var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
@@ -222,57 +224,60 @@ function addSpheres(scene) {
     imgTexture.anisotropy = 16;
     imgTexture = null;
 
-    for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
-        var specularShininess = Math.pow( 2, alpha * 10 );
+    var specularShininess = Math.pow( 2,  1.0* 10 );
 
-        for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
+    for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
 
-            var specularColor = new THREE.Color( beta * 0.2, beta * 0.2, beta * 0.2 );
+        var specularColor = new THREE.Color( beta * 0.2, beta * 0.2, beta * 0.2 );
 
-            for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
+        for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
-                // basic monochromatic energy preservation
-                var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 ).multiplyScalar( 1 - beta * 0.2 );
+            // basic monochromatic energy preservation
+            var diffuseColor = new THREE.Color().setHSL( 0.0, 0.5, 0 );
 
-                var material = new THREE.MeshPhongMaterial( {
-                    map: imgTexture,
-                    bumpMap: imgTexture,
-                    bumpScale: bumpScale,
-                    color: diffuseColor,
-                    specular: specularColor,
-                    reflectivity: beta,
-                    shininess: specularShininess,
-                    shading: THREE.SmoothShading,
-                    envMap: null
-                } );
+            var material = new THREE.MeshPhongMaterial( {
+                map: imgTexture,
+                bumpMap: imgTexture,
+                bumpScale: bumpScale,
+                color: diffuseColor,
+                specular: specularColor,
+                reflectivity: beta,
+                shininess: specularShininess,
+                shading: THREE.SmoothShading,
+                envMap: null
+            } );
 
-                var mesh = new THREE.Mesh( geometry, material );
+            var mesh = new THREE.Mesh( geometry, material );
 
-                mesh.position.x = alpha * 400 - 200;
-                mesh.position.y = beta * 400 - 200;
-                mesh.position.z = gamma * 400 - 200;
+            mesh.position.x = 0.0;
+            mesh.position.y = beta * 1000;
+            mesh.position.z = gamma * 400 - 200;
 
-                scene.add( mesh );
-
-            }
+            scene.add( mesh );
 
         }
 
     }
+
 }
 
 function init() {
     container = document.getElementById( 'container' );
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
-    camera.position.z = 2;
+    // camera.position.z = 60;
+    camera.rotation.y = 1.5;
+    camera.position.x = -1606;
+    camera.position.y = -5.5;
+    camera.position.z = 80;
 
     scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0xffffff );
 
     // geometry
 
     var loader = new THREE.PLYLoader();
-    loader.load( 'assets/models/apse-simple.ply', loaderGuts);
+    loader.load( 'assets/models/tree-scan-small.ply', loaderGuts);
 
 
     renderer = new THREE.WebGLRenderer();
@@ -298,7 +303,7 @@ function init() {
 
     // LIGHTS
 
-    var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+    hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
     hemiLight.color.setHSL( 0.6, 1, 0.6 );
     hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
     hemiLight.position.set( 0, 500, 0 );
@@ -327,19 +332,6 @@ function init() {
     dirLight.shadow.camera.far = 3500;
     dirLight.shadow.bias = -0.0001;
 
-    // GROUND
-
-    var groundGeo = new THREE.PlaneBufferGeometry( 10000, 10000 );
-    var groundMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x050505 } );
-    groundMat.color.setHSL( 0.095, 1, 0.75 );
-
-    var ground = new THREE.Mesh( groundGeo, groundMat );
-    ground.rotation.x = -Math.PI/2;
-    ground.position.y = -33;
-    scene.add( ground );
-
-    ground.receiveShadow = true;
-
     // Controls
     controls = new THREE.OrbitControls( camera );
     controls.target.set( 0, 0, 0 );
@@ -367,11 +359,16 @@ function animate() {
 function render() {
     var time = performance.now();
     var object = ourMesh;
-
+    // camera.rotation.y = Math.cos(time*.001);
+    // camera.position.y += Math.cos(time*.001);
     if (!!object){
         object.material.uniforms.time.value = time * 0.005;
         object.material.uniforms.range.value = Math.sin(time*.001);
         object.material.uniforms.sineTime.value = Math.sin( object.material.uniforms.time.value * 0.05 );
+
+
+        ourMesh.rotation.x = Math.cos(time*.01) * 0.1;
+        ourMesh.rotation.y = Math.sin(time*.01) * 0.1;
 
         if (guiData.stereo) {
             effect.render( scene, camera );

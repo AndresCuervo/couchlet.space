@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials</title>
+		<title>l0r3m</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -57,17 +57,18 @@
 
             varying vec3 vPosition;
             varying vec4 vColor;
+            varying float distFromCenter;
 
             void main(){
-                vPosition = offset + range * position;
-                vec4 orientation = mix(vec4(offset,1), normalize(orientationStart),range);
+                vPosition = 10.0*offset +  position;
+                vec4 orientation = vec4(offset,1);
                 vec3 vcV = cross(orientation.xyz, vPosition);
                 vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
 
                 vColor = color;
 
+                distFromCenter = length(position.xyz);
                 gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
-
             }
 
         </script>
@@ -80,13 +81,12 @@
 
             varying vec3 vPosition;
             varying vec4 vColor;
+            varying float distFromCenter;
 
             void main() {
 
-                vec4 color = vec4( vColor );
-                //color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
-
-                gl_FragColor = color;
+                float x = length( vPosition ) * 4.0;
+                gl_FragColor = vColor;
             }
         </script>
 
