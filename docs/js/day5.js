@@ -13,22 +13,6 @@ var guiData = {
     'stereo' : false
 };
 
-gui.add( guiData, "stereo");
-
-function addPhongSphere(scene) {
-    var sphereGeometry = new THREE.SphereGeometry(14, 20, 20);
-    var meshMaterial = new THREE.MeshPhongMaterial({color: 0x7777ff});
-    var sphere = new THREE.Mesh(sphereGeometry, meshMaterial);
-    sphere.castShadow = true;
-    // position the sphere
-    sphere.position.x = 0;
-    sphere.position.y = 0;
-    sphere.position.z = -3;
-    // add the sphere to the scene
-    sphere.name = "phongSphere";
-    scene.add(sphere);
-}
-
 function createGeometry() {
     var triangles = 6;
     var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
@@ -40,7 +24,7 @@ function createGeometry() {
     vertices.setXYZ(3, s, s,-s);
     vertices.setXYZ(4, 0,-s/10.0,-s);
     vertices.setXYZ(5, -s, s,-s);
-	/*
+    /*
     vertices.setXYZ(6, s,-s, s);
     vertices.setXYZ(7, -s,-s,-s);
     vertices.setXYZ(8, s,-s,-s);
@@ -71,7 +55,7 @@ function createGeometry() {
     vertices.setXYZ(33, s, s, s);
     vertices.setXYZ(34, -s, s, s);
     vertices.setXYZ(35, s,-s, s);
-	*/
+    */
 
     return vertices;
 }
@@ -93,7 +77,7 @@ function loaderGuts ( plyLoader ) {
 
     geometry = new THREE.InstancedBufferGeometry();
 
-    geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
+    geometry.maxInstancedCount = instances;
     gui.add( geometry, "maxInstancedCount", 0, instances ).listen();
 
     var vertices = createGeometry();
@@ -111,8 +95,6 @@ function loaderGuts ( plyLoader ) {
 
     geometry.addAttribute( 'offset', offsets );
 
-
-    // colorAvg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
     var colors = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
     for ( var i = 0, ul = colors.count; i < ul; i++ ) {
 
@@ -120,7 +102,6 @@ function loaderGuts ( plyLoader ) {
 
     }
     geometry.addAttribute( 'color', colors );
-
 
     var vector = new THREE.Vector4();
     var range = 1;
@@ -133,7 +114,7 @@ function loaderGuts ( plyLoader ) {
         var z = loaderPositions[i*3+2] * scale;
         vector.set(x, y, z,1);
 
-        vector.set(	x - range * Math.random() - (range/2.0),
+        vector.set( x - range * Math.random() - (range/2.0),
             y - range * Math.random() - (range/2.0),
             z - range * Math.random() - (range/2.0),
             1.0 - range * Math.random() - (range/2.0));
@@ -143,6 +124,7 @@ function loaderGuts ( plyLoader ) {
         orientationsStart.setXYZW( i, vector.x, vector.y, vector.z, vector.w );
 
     }
+    
     geometry.addAttribute( 'orientationStart', orientationsStart );
 
     var orientationsEnd = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
@@ -156,31 +138,6 @@ function loaderGuts ( plyLoader ) {
     }
     geometry.addAttribute( 'orientationEnd', orientationsEnd );
 
-
-    // tranfer variables from the plyLoader to the buffer instance
-    // for ( var i = 0; i < positions.length; i += 3 ) {
-    //
-    // positions[ i ]     = x * scale;
-    // positions[ i + 1 ] = y * scale;
-    // positions[ i + 2 ] = z * scale;
-    //
-    //
-    // normals[ i ]     = c[i + 0];
-    // normals[ i + 1 ] = c[i + 1];
-    // normals[ i + 2 ] = c[i + 2];
-    //
-    // colorAvg = (c[ i ] + c[ i + 1] + c[ i + 2]) / 3;
-    // colors[ i + 0 ] = guiData.colorWhite ? 1 : colorAvg;
-    // colors[ i + 1 ] = guiData.colorWhite ? 1 : colorAvg;
-    // colors[ i + 2 ] = guiData.colorWhite ? 1 : colorAvg;
-
-    // sizes[i/3] = guiData.particleSize;
-    // }
-
-
-    // material
-
-
     var material = new THREE.RawShaderMaterial( {
 
         uniforms: {
@@ -190,85 +147,23 @@ function loaderGuts ( plyLoader ) {
         },
         vertexShader: document.getElementById( 'vertexShader' ).textContent,
         fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-        // side: THREE.DoubleSide,
-        // lights: true,
         transparent: false
 
     } );
-
-    // addPhongSphere(scene);
-    // addSpheres(scene);
 
     ourMesh = new THREE.Mesh( geometry, material );
     ourMesh.castShadow = true;
     ourMesh.receiveShadow = true;
 
-	ourMesh.scale = 10.0;
-	//ourMesh.rotation.set(new THREE.Vector3(Math.PI / 2, 0, 0));
-	
-    // ourMesh.rotation.z = 90;
+    ourMesh.scale = 10.0;
+    
     scene.add( ourMesh );
 
     geometry.maxInstancedCount = Math.min(100000, geometry.maxInstancedCount);
 }
 
-function addSpheres(scene) {
-    var shininess = 50, specular = 0x333333, bumpScale = 1, shading = THREE.SmoothShading;
-
-    var materials = [];
-
-    var cubeWidth = 40;
-    var numberOfSphersPerSide = 25;
-    var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) ;
-    var stepSize = 1.0 / numberOfSphersPerSide;
-
-    var geometry = new THREE.SphereBufferGeometry( sphereRadius, 32, 16 );
-
-    var imgTexture = new THREE.TextureLoader().load( "../textures/planets/moon_1024.jpg" );
-    imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
-    imgTexture.anisotropy = 16;
-    imgTexture = null;
-
-
-    var specularShininess = Math.pow( 2,  1.0* 10 );
-
-    for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
-
-        var specularColor = new THREE.Color( beta * 0.2, beta * 0.2, beta * 0.2 );
-
-        for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
-
-            // basic monochromatic energy preservation
-            var diffuseColor = new THREE.Color().setHSL( 0.0, 0.5, 0 );
-
-            var material = new THREE.MeshPhongMaterial( {
-                map: imgTexture,
-                bumpMap: imgTexture,
-                bumpScale: bumpScale,
-                color: diffuseColor,
-                specular: specularColor,
-                reflectivity: beta,
-                shininess: specularShininess,
-                shading: THREE.SmoothShading,
-                envMap: null
-            } );
-
-            var mesh = new THREE.Mesh( geometry, material );
-
-            mesh.position.x = 0.0;
-            mesh.position.y = beta * 1000;
-            mesh.position.z = gamma * 400 - 200;
-			
-
-            scene.add( mesh );
-
-        }
-
-    }
-
-}
-
 function init() {
+    gui.add( guiData, "stereo");
     container = document.getElementById( 'container' );
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
     // camera.position.z = 60;
@@ -345,15 +240,11 @@ function init() {
 }
 
 function onWindowResize( event ) {
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
     renderer.setSize( window.innerWidth, window.innerHeight );
-
 }
-
-//
 
 function animate() {
     requestAnimationFrame( animate );
