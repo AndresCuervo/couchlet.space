@@ -1,75 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>l0r3m</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
+    <head>
+        <title>l0r3m</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link rel="stylesheet" href="css/three.css">
+        <link rel="shortcut icon" href="favicon.png" type="image/x-icon">
+    </head>
+    <body>
 
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
-	</head>
-	<body>
-
-		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - Phong Material Variantions by <a href="http://clara.io/" target="_blank">Ben Houston</a>.</div>
-
-		<script src="js/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+        <div id="container"></div>
+        <script src="js/three.js"></script>
+        <script src="js/controls/OrbitControls.js"></script>
+        <script src="js/controls/DeviceOrientationControls.js"></script>
 
 
         <script src="js/utils/dat.gui.min.js"></script>
         <script src="js/loaders/PLYLoader.js"></script>
         <script src="js/effects/StereoEffect.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/stats.min.js"></script>
+        <script src="js/Detector.js"></script>
+        <script src="js/stats.min.js"></script>
 
 
         <script id="vertexShader" type="x-shader/x-vertex">
             precision highp float;
 
-            uniform float sineTime;
-            uniform float range;
+uniform float sineTime;
+uniform float range;
 
-            uniform mat4 modelViewMatrix;
-            uniform mat4 projectionMatrix;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
 
-            attribute vec3 position;
-            attribute vec3 offset;
-            attribute vec4 color;
-            attribute vec4 orientationStart;
-            attribute vec4 orientationEnd;
+attribute vec3 position;
+attribute vec3 offset;
+attribute vec4 color;
+attribute vec4 orientationStart;
+attribute vec4 orientationEnd;
 
-            varying vec3 vPosition;
-            varying vec4 vColor;
-            varying float distFromCenter;
+varying vec3 vPosition;
+varying vec4 vColor;
+varying float distFromCenter;
 
-            void main(){
-                vPosition = 10.0*offset +  position;
-                vec4 orientation = vec4(offset,1);
-                vec3 vcV = cross(orientation.xyz, vPosition);
-                vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
+void main(){
+    vPosition = 10.0*offset +  position;
+    vec4 orientation = vec4(offset,1);
+    vec3 vcV = cross(orientation.xyz, vPosition);
+    vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
 
-                vColor = color;
+    vColor = color;
 
-                distFromCenter = length(position.xyz);
-                gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
-            }
+    distFromCenter = length(position.xyz);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
+}
 
         </script>
 
@@ -77,23 +60,23 @@
 
             precision highp float;
 
-            uniform float time;
+uniform float time;
 
-            varying vec3 vPosition;
-            varying vec4 vColor;
-            varying float distFromCenter;
+varying vec3 vPosition;
+varying vec4 vColor;
+varying float distFromCenter;
 
-            void main() {
+void main() {
 
-                float x = length( vPosition ) * 4.0;
-                gl_FragColor = vColor;
-            }
+    float x = length( vPosition ) * 4.0;
+    gl_FragColor = vColor;
+}
         </script>
 
 
-		<!-- <script src="js/day5_.js"></script> -->
-		<script src="js/day5.js"></script>
+        <!-- <script src="js/day5_.js"></script> -->
+        <script src="js/day5.js"></script>
 
-	</body>
+    </body>
 </html>
 0

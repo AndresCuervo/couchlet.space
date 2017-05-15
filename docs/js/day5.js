@@ -30,16 +30,17 @@ function addPhongSphere(scene) {
 }
 
 function createGeometry() {
-    var triangles = 36;
+    var triangles = 6;
     var vertices = new THREE.BufferAttribute( new Float32Array( triangles * 3 * 3 ), 3 );
 
-    var s = 0.001;
+    var s = 0.005;
     vertices.setXYZ(0, -s,-s,-s);
-    vertices.setXYZ(1, -s,-s, s);
+    vertices.setXYZ(1, 0,-s/10.0, s);
     vertices.setXYZ(2, -s, s, s);
     vertices.setXYZ(3, s, s,-s);
-    vertices.setXYZ(4, -s,-s,-s);
+    vertices.setXYZ(4, 0,-s/10.0,-s);
     vertices.setXYZ(5, -s, s,-s);
+	/*
     vertices.setXYZ(6, s,-s, s);
     vertices.setXYZ(7, -s,-s,-s);
     vertices.setXYZ(8, s,-s,-s);
@@ -70,6 +71,7 @@ function createGeometry() {
     vertices.setXYZ(33, s, s, s);
     vertices.setXYZ(34, -s, s, s);
     vertices.setXYZ(35, s,-s, s);
+	*/
 
     return vertices;
 }
@@ -98,7 +100,7 @@ function loaderGuts ( plyLoader ) {
 
     geometry.addAttribute( 'position', vertices );
 
-    var scale = 500.0;
+    var scale = 1200.0;
     var offsets = new THREE.InstancedBufferAttribute( new Float32Array( instances * 3 ), 3, 1 );
     for ( var i = 0, ul = offsets.count; i < ul; i++ ) {
         var x = loaderPositions[i*3]   * scale;
@@ -114,7 +116,7 @@ function loaderGuts ( plyLoader ) {
     var colors = new THREE.InstancedBufferAttribute( new Float32Array( instances * 4 ), 4, 1 );
     for ( var i = 0, ul = colors.count; i < ul; i++ ) {
 
-        colors.setXYZW(i, loaderColors[i*3], loaderColors[i*3 + 1], loaderColors[i*3 + 2]);
+        colors.setXYZW(i, .1*loaderColors[i*3], 0.0*loaderColors[i*3 + 1], 1.3*loaderColors[i*3 + 2]);
 
     }
     geometry.addAttribute( 'color', colors );
@@ -200,7 +202,10 @@ function loaderGuts ( plyLoader ) {
     ourMesh = new THREE.Mesh( geometry, material );
     ourMesh.castShadow = true;
     ourMesh.receiveShadow = true;
-    ourMesh.rotation.y = 135;
+
+	ourMesh.scale = 10.0;
+	//ourMesh.rotation.set(new THREE.Vector3(Math.PI / 2, 0, 0));
+	
     // ourMesh.rotation.z = 90;
     scene.add( ourMesh );
 
@@ -253,6 +258,7 @@ function addSpheres(scene) {
             mesh.position.x = 0.0;
             mesh.position.y = beta * 1000;
             mesh.position.z = gamma * 400 - 200;
+			
 
             scene.add( mesh );
 
@@ -266,13 +272,12 @@ function init() {
     container = document.getElementById( 'container' );
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
     // camera.position.z = 60;
-    camera.rotation.y = 1.5;
-    camera.position.x = -1606;
+    camera.position.x = -500;
     camera.position.y = -5.5;
-    camera.position.z = 80;
+    camera.position.z = 200;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xffffff );
+    scene.background = new THREE.Color( 0x000000 );
 
     // geometry
 
@@ -333,6 +338,7 @@ function init() {
     dirLight.shadow.bias = -0.0001;
 
     // Controls
+    var orientationControls= new THREE.DeviceOrientationControls( camera );
     controls = new THREE.OrbitControls( camera );
     controls.target.set( 0, 0, 0 );
     controls.update();
@@ -367,8 +373,8 @@ function render() {
         object.material.uniforms.sineTime.value = Math.sin( object.material.uniforms.time.value * 0.05 );
 
 
-        ourMesh.rotation.x = Math.cos(time*.01) * 0.1;
-        ourMesh.rotation.y = Math.sin(time*.01) * 0.1;
+        ourMesh.rotation.x = Math.cos(time*.001) * 0.1;
+        ourMesh.rotation.y = Math.sin(time*.001) * 0.1;
 
         if (guiData.stereo) {
             effect.render( scene, camera );
