@@ -1,4 +1,4 @@
-baseURL = "http://andrescuervo.github.io/twentyfourseven/"
+baseURL = "https://andrescuervo.github.io/twentyfourseven/"
 languageCode = "en-us"
 title = "My New Hugo Site"
 publishDir = "docs"

@@ -2,56 +2,56 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>My New Hugo Site</title>
-    <link>http://andrescuervo.github.io/twentyfourseven/</link>
+    <link>https://andrescuervo.github.io/twentyfourseven/</link>
     <description>Recent content on My New Hugo Site</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
-	<atom:link href="http://andrescuervo.github.io/twentyfourseven/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://andrescuervo.github.io/twentyfourseven/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>05.10.2017</title>
-      <link>http://andrescuervo.github.io/twentyfourseven/day1/</link>
+      <link>https://andrescuervo.github.io/twentyfourseven/day1/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://andrescuervo.github.io/twentyfourseven/day1/</guid>
+      <guid>https://andrescuervo.github.io/twentyfourseven/day1/</guid>
       <description></description>
     </item>
     
     <item>
       <title>05.11.2017</title>
-      <link>http://andrescuervo.github.io/twentyfourseven/day2/</link>
+      <link>https://andrescuervo.github.io/twentyfourseven/day2/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://andrescuervo.github.io/twentyfourseven/day2/</guid>
+      <guid>https://andrescuervo.github.io/twentyfourseven/day2/</guid>
       <description>   attribute float size; attribute vec3 customColor; varying vec3 vColor; void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_PointSize = size * ( 300.0 / -mvPosition.z ); gl_Position = projectionMatrix * mvPosition; }  uniform vec3 color; uniform sampler2D texture; varying vec3 vColor; void main() { gl_FragColor = vec4( color * vColor, 1.0 ); gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord ); }   </description>
     </item>
     
     <item>
       <title>05.12.2017</title>
-      <link>http://andrescuervo.github.io/twentyfourseven/day3/</link>
+      <link>https://andrescuervo.github.io/twentyfourseven/day3/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://andrescuervo.github.io/twentyfourseven/day3/</guid>
+      <guid>https://andrescuervo.github.io/twentyfourseven/day3/</guid>
       <description>        attribute float size; attribute vec3 customColor; varying vec3 vColor; void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_PointSize = size * ( 300.0 / -mvPosition.z ); gl_Position = projectionMatrix * mvPosition; }  uniform vec3 color; uniform sampler2D texture; varying vec3 vColor; void main() { gl_FragColor = vec4( color * vColor, 1.0 ); gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord ); }   </description>
     </item>
     
     <item>
       <title>05.13.2017</title>
-      <link>http://andrescuervo.github.io/twentyfourseven/day4/</link>
+      <link>https://andrescuervo.github.io/twentyfourseven/day4/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://andrescuervo.github.io/twentyfourseven/day4/</guid>
+      <guid>https://andrescuervo.github.io/twentyfourseven/day4/</guid>
       <description>Sorry your graphics card + browser does not support hardware instancing        precision highp float; uniform float sineTime; uniform float range; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; attribute vec3 position; attribute vec3 offset; attribute vec4 color; attribute vec4 orientationStart; attribute vec4 orientationEnd; varying vec3 vPosition; varying vec4 vColor; void main(){ vPosition = offset + range * position; vec4 orientation = mix(vec4(offset,1), normalize(orientationStart),range); vec3 vcV = cross(orientation.</description>
     </item>
     
     <item>
       <title>05.14.2017</title>
-      <link>http://andrescuervo.github.io/twentyfourseven/day5/</link>
+      <link>https://andrescuervo.github.io/twentyfourseven/day5/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
-      <guid>http://andrescuervo.github.io/twentyfourseven/day5/</guid>
+      <guid>https://andrescuervo.github.io/twentyfourseven/day5/</guid>
       <description>precision highp float; uniform float sineTime; uniform float range; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; attribute vec3 position; attribute vec3 offset; attribute vec4 color; attribute vec4 orientationStart; attribute vec4 orientationEnd; varying vec3 vPosition; varying vec4 vColor; varying float distFromCenter; void main(){ vPosition = 10.0*offset + position; vec4 orientation = vec4(offset,1); vec3 vcV = cross(orientation.xyz, vPosition); vPosition = vcV * (2.0 * orientation.</description>
     </item>
     
