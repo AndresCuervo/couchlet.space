@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>05.11.2017 &middot; My New Hugo Site</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="http://andrescuervo.github.io/twentyfourseven//libraries/normalize.3.0.1.css" />
+        
+        <link rel="apple-touch-icon-precomposed" href="/favicon.png" sizes="144x144" />
+        
+
+        
+        
+            <link rel="stylesheet" href="../css/three.css">
+        
+        <link rel="shortcut icon" href= "http://andrescuervo.github.io/twentyfourseven//favicon.png" type="image/x-icon">
+    </head>
+    <body class="li-body">
+
+
+
+
+<script src="../js/three.js"></script>
+
+<script src="../js/Detector.js"></script>
+<script src="../js/stats.min.js"></script>
+<script src="../js/loaders/PLYLoader.js"></script>
+
+
+<script type="text/javascript" src="../js/utils/dat.gui.min.js"></script>
+
+<script src="../js/TrackballControls.js"></script>
+<script src="../js/effects/AnaglyphEffect.js"></script>
+<script src="../js/utils/dat.gui.min.js"></script>
+
+<script type="x-shader/x-vertex" id="vertexshader">
+    attribute float size;
+    attribute vec3 customColor;
+
+    varying vec3 vColor;
+
+    void main() {
+
+        vColor = customColor;
+
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+        gl_PointSize = size * ( 300.0 / -mvPosition.z );
+
+        gl_Position = projectionMatrix * mvPosition;
+
+    }
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentshader">
+    uniform vec3 color;
+    uniform sampler2D texture;
+
+    varying vec3 vColor;
+
+    void main() {
+
+        gl_FragColor = vec4( color * vColor, 1.0 );
+
+        gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord );
+
+    }
+</script>
+
+<script src="../js/day2.js"></script>
+
+
+
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+    </body>
+</html>
+

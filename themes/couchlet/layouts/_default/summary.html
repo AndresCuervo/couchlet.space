@@ -1,0 +1,15 @@
+<!-- <article> -->
+<!--     <header> -->
+<!--         <h2><a href="{{ .Permalink }}">{{ .Title }} {{ if .Draft }} (draft) {{end}}</a></h2> -->
+<!--         <time class="li&#45;article&#45;date">{{ .Date.Format "Monday, January 2, 2006" }}</time> -->
+<!--     </header> -->
+<!--     <section class="li&#45;article&#45;section"> -->
+<!--         {{ .Summary }} -->
+<!--     </section> -->
+<!--     <footer> -->
+<!--         <a href='{{ .Permalink }}'>More</a> -->
+<!--     </footer> -->
+<!-- </article> -->
+
+<!-- <li><a href="{{ .Permalink }}>">{{ .Title}}</a></li> -->
+<li><a href="{{ .Permalink }}">{{ index .Params "display"}}</a></li>

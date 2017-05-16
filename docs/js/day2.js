@@ -14,81 +14,15 @@ var guiData = {
     'particleSize' : 1
 };
 
+var windowHalfX = window.innerWidth / 2;
+var windowHalfY = window.innerHeight / 2;
+// document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+init();
+animate();
 
 var g;
 var geo;
-
-function loaderGuts(geometry){
-    uniforms = {
-
-        color:     { value: new THREE.Color( 0xffffff ) },
-        texture:   { value: new THREE.TextureLoader().load( "textures/spark.png" ) }
-
-    };
-
-    var shaderMaterial = new THREE.ShaderMaterial( {
-
-        uniforms:       uniforms,
-        vertexShader:   document.getElementById( 'vertexshader' ).textContent,
-        fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-
-        blending:       THREE.NormalBlending,
-        depthTest:      true,
-        transparent:    true,
-
-
-    });
-
-    g = geometry.attributes.position.array;
-    c = geometry.attributes.color.array;
-
-    console.log(geometry);
-    particles = g.length / 3;
-
-    var radius = 3;
-
-    geometry = new THREE.BufferGeometry();
-
-    var positions = new Float32Array( particles * 3 );
-    var colors = new Float32Array( particles * 3 );
-    var sizes = new Float32Array( particles );
-
-    var color = new THREE.Color();
-
-    var scale = 800;
-    for ( var i = 0; i < positions.length; i += 3 ) {
-
-        // positions
-        var x = g[i];
-        var y = g[i+1];
-        var z = g[i+2];
-
-        positions[ i ]     = x * scale;
-        positions[ i + 1 ] = y * scale;
-        positions[ i + 2 ] = z * scale;
-
-        colors[ i + 0 ] = c[ i ];
-        colors[ i + 1 ] = c[ i + 1];
-        colors[ i + 2 ] = c[ i + 2];
-
-        sizes[i/3] = guiData.particleSize;
-    }
-
-    geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-    geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-    geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
-
-    particleSystem = new THREE.Points( geometry, shaderMaterial );
-
-    scene.add( particleSystem );
-
-    geo = geometry;
-
-    var width = window.innerWidth || 2;
-    var height = window.innerHeight || 2;
-    effect = new THREE.AnaglyphEffect( renderer );
-    effect.setSize( width, height );
-}
 
 function init() {
 
@@ -98,7 +32,81 @@ function init() {
     scene = new THREE.Scene();
 
     var loader = new THREE.PLYLoader();
-    loader.load( 'assets/models/moss-garden-cloud-tiny-2.ply', loaderGuts);
+    loader.load( '../assets/models/moss-garden-cloud-tiny-2.ply', function ( geometry ) {
+
+
+        uniforms = {
+
+            color:     { value: new THREE.Color( 0xffffff ) },
+            texture:   { value: new THREE.TextureLoader().load( "../textures/spark.png" ) }
+
+        };
+
+        var shaderMaterial = new THREE.ShaderMaterial( {
+
+            uniforms:       uniforms,
+            vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
+
+            blending:       THREE.NormalBlending,
+            depthTest:      true,
+            transparent:    true,
+
+
+        });
+
+        g = geometry.attributes.position.array;
+        c = geometry.attributes.color.array;
+
+        console.log(geometry);
+        particles = g.length / 3;
+
+        var radius = 3;
+
+        geometry = new THREE.BufferGeometry();
+
+        var positions = new Float32Array( particles * 3 );
+        var colors = new Float32Array( particles * 3 );
+        var sizes = new Float32Array( particles );
+
+        var color = new THREE.Color();
+
+        var scale = 800;
+        for ( var i = 0; i < positions.length; i += 3 ) {
+
+            // positions
+            var x = g[i];
+            var y = g[i+1];
+            var z = g[i+2];
+
+            positions[ i ]     = x * scale;
+            positions[ i + 1 ] = y * scale;
+            positions[ i + 2 ] = z * scale;
+
+            colors[ i + 0 ] = c[ i ];
+            colors[ i + 1 ] = c[ i + 1];
+            colors[ i + 2 ] = c[ i + 2];
+
+            sizes[i/3] = guiData.particleSize;
+        }
+
+        geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+        geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+        geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+
+        particleSystem = new THREE.Points( geometry, shaderMaterial );
+
+        scene.add( particleSystem );
+
+        geo = geometry;
+
+
+        var width = window.innerWidth || 2;
+        var height = window.innerHeight || 2;
+        effect = new THREE.AnaglyphEffect( renderer );
+        effect.setSize( width, height )
+    } );
+
 
     renderer = new THREE.WebGLRenderer( { antialias: false } );
     renderer.setPixelRatio( window.devicePixelRatio );
@@ -144,9 +152,18 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    effect.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    effect.setSize( window.innerWidth, window.innerHeight );
+
+
 }
+
+function onDocumentMouseMove(event) {
+    mouseX = ( event.clientX - windowHalfX ) / 100;
+    mouseY = ( event.clientY - windowHalfY ) / 100;
+}
+
 
 function animate() {
 
@@ -196,7 +213,7 @@ function render() {
     } else {
         renderer.render( scene, camera );
     }
+
+
 }
 
-init();
-animate();

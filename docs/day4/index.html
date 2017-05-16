@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="//www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+    <head>
+
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+
+        <title>05.13.2017 &middot; My New Hugo Site</title>
+        <link rel='stylesheet' href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' type='text/css'>
+        <link rel="stylesheet" href="http://andrescuervo.github.io/twentyfourseven//libraries/normalize.3.0.1.css" />
+        
+        <link rel="apple-touch-icon-precomposed" href="/favicon.png" sizes="144x144" />
+        
+
+        
+        
+            <link rel="stylesheet" href="../css/three.css">
+        
+        <link rel="shortcut icon" href= "http://andrescuervo.github.io/twentyfourseven//favicon.png" type="image/x-icon">
+    </head>
+    <body class="li-body">
+
+
+
+
+<script src="../js/three.js"></script>
+
+<script src="../js/Detector.js"></script>
+<script src="../js/stats.min.js"></script>
+<script src="../js/loaders/PLYLoader.js"></script>
+
+
+<script type="text/javascript" src="../js/utils/dat.gui.min.js"></script>
+
+<div id="container"></div>
+<div id="info">
+    <div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+</div>
+
+<script src="../js/three.js"></script>
+<script src="../js/utils/dat.gui.min.js"></script>
+<script src="../js/Detector.js"></script>
+<script src="../js/stats.min.js"></script> <!-- TODO move this in future -->
+<script src="../js/loaders/PLYLoader.js"></script>
+<script src="../js/effects/StereoEffect.js"></script>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+    precision highp float;
+
+    uniform float sineTime;
+    uniform float range;
+
+    uniform mat4 modelViewMatrix;
+    uniform mat4 projectionMatrix;
+
+    attribute vec3 position;
+    attribute vec3 offset;
+    attribute vec4 color;
+    attribute vec4 orientationStart;
+    attribute vec4 orientationEnd;
+
+    varying vec3 vPosition;
+    varying vec4 vColor;
+
+    void main(){
+        vPosition = offset + range * position;
+        vec4 orientation = mix(vec4(offset,1), normalize(orientationStart),range);
+        vec3 vcV = cross(orientation.xyz, vPosition);
+        vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition);
+
+        vColor = color;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
+
+    }
+
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+
+    precision highp float;
+
+    uniform float time;
+
+    varying vec3 vPosition;
+    varying vec4 vColor;
+
+    void main() {
+
+        vec4 color = vec4( vColor );
+        //color.r += sin( vPosition.x * 10.0 + time ) * 0.5;
+
+        gl_FragColor = color;
+    }
+</script>
+
+<script src="../js/day4.js"></script>
+
+
+
+    <script type="text/javascript">
+    <!--
+    function toggle(id) {
+        var e = document.getElementById(id);
+        e.style.display == 'block' ? e.style.display = 'none' : e.style.display = 'block';
+    }
+    
+    </script>
+    
+    </body>
+</html>
+
