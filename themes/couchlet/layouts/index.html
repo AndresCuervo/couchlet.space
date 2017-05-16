@@ -1,10 +1,8 @@
 {{ partial "head.html" . }}
 
 <ol class="list">
-    {{ range first 10 .Data.Pages }}
-    <li>
+    {{ range .Data.Pages }}
         {{ .Render "summary"}}
-    </li>
     {{ end }}
     <img class="bg" src="./assets/images/bg.jpg" alt="Background image of poles">
 </ol>
