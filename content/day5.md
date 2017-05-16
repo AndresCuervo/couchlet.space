@@ -2,8 +2,6 @@
 title: 05.14.2017
 display: lor3m
 ---
-
-<div id="container"></div>
 <script src="../js/three.js"></script>
 <script src="../js/controls/OrbitControls.js"></script>
 <script src="../js/controls/DeviceOrientationControls.js"></script>
@@ -64,5 +62,7 @@ display: lor3m
         gl_FragColor = vColor;
     }
 </script>
+
+<div id="container"></div>
 
 <script src="../js/day5.js"></script>

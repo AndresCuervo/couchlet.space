@@ -1,9 +1,9 @@
 ---
-title: "05.12.2017"
+title: 05.12.2017
 display: (L) A P S E
 ---
-
 <script src="../js/aframe/0.5.0/aframe.min.js"></script>
+
 <div id="container">
 </div>
 <a-scene make-point-cloud>
