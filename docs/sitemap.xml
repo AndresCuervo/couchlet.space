@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/day1/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/day2/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/day3/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/day4/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/day5/</loc>
+  </url>
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://andrescuervo.github.io/twentyfourseven/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

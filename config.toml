@@ -1,0 +1,9 @@
+baseURL = "https://andrescuervo.github.io/twentyfourseven/"
+languageCode = "en-us"
+title = "My New Hugo Site"
+theme = "liquorice"
+
+publishDir = "docs"
+
+[params]
+    author = "couchlet"
