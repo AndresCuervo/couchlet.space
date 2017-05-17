@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title> ့</title>
+    <title>᠅</title>
     <link>https://andrescuervo.github.io/twentyfourseven/</link>
-    <description>Recent content on  ့</description>
+    <description>Recent content on ᠅</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     
@@ -54,6 +54,15 @@
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day5/</guid>
       <description>precision highp float; uniform float sineTime; uniform float range; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; attribute vec3 position; attribute vec3 offset; attribute vec4 color; attribute vec4 orientationStart; attribute vec4 orientationEnd; varying vec3 vPosition; varying vec4 vColor; varying float distFromCenter; void main(){ vPosition = 10.0*offset + position; vec4 orientation = vec4(offset,1); vec3 vcV = cross(orientation.xyz, vPosition); vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.</description>
+    </item>
+    
+    <item>
+      <title>05.16.2017</title>
+      <link>https://andrescuervo.github.io/twentyfourseven/day6/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://andrescuervo.github.io/twentyfourseven/day6/</guid>
+      <description>varying float depth; varying float z_coord; uniform float center_x; uniform float center_y; uniform float time; void main() { float scale = (sin(time*0.2)+1.0)*.01 + .004; float height = 200.0; vec3 vertex = position; vertex.z += exp(-(pow((vertex.x-center_x)*scale, 2.0) + pow((vertex.y-center_y)*scale, 2.0))) * height; vec4 cs_pos = projectionMatrix * modelViewMatrix * vec4( vertex, 1.0 ); depth = cs_pos.z * .001; z_coord = vertex.x; gl_Position = cs_pos; }  varying float depth; varying float z_coord; uniform float time; void main() { float proportion = (sin(time*.</description>
     </item>
     
   </channel>
