@@ -4,8 +4,10 @@ var container, stats;
 var camera, scene, renderer, effect;
 var mesh;
 
+var controls;
 var gui = new dat.GUI();
 
+var orientation = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
 var guiData = {
     'stereo' : false
 };
@@ -13,14 +15,14 @@ var guiData = {
 var mouse = {x: 0, y: 0};
 
 function init() {
-	gui.add( guiData, "stereo");
+    gui.add( guiData, "stereo");
     container = document.getElementById( 'container' );
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
     camera.position.x = 0;
-    camera.position.y = -500;
+    //    camera.position.y = -500;
     camera.position.z = 500;
-	//camera.up = new THREE.Vector3(1,0,0);
-	camera.lookAt(new THREE.Vector3(0,0,0));
+    //camera.up = new THREE.Vector3(1,0,0);
+    camera.lookAt(new THREE.Vector3(0,0,0));
     // camera.position.z = 60;
 
 
@@ -28,25 +30,25 @@ function init() {
     scene.background = new THREE.Color( 0xbbaaee );
 
     // geometry
-	var geometry = new THREE.PlaneGeometry(2500, 2500, 100, 100);
-	//var geometry = new THREE.RingGeometry( .001, 5000, 200 );
-	//var geometry = new THREE.TorusKnotGeometry( 1000, 300, 100, 100 );
-	
-	var material = new THREE.ShaderMaterial( {
+    var geometry = new THREE.PlaneGeometry(2500, 2500, 500, 500);
+    //var geometry = new THREE.RingGeometry( .001, 5000, 200 );
+    //var geometry = new THREE.TorusKnotGeometry( 1000, 300, 100, 100 );
 
-		uniforms: {
-			time: { value: 1.0 },
-			center_x: { value: 0.0},
-			center_y: { value: 0.0}
-		},
+    var material = new THREE.ShaderMaterial( {
 
-		vertexShader: document.getElementById( 'vertexShader' ).textContent,
-		fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+        uniforms: {
+            time: { value: 1.0 },
+            center_x: { value: 0.0},
+            center_y: { value: 0.0}
+        },
 
-	} );
-	
-	mesh = new THREE.Mesh(geometry, material);
-	scene.add(mesh)
+        vertexShader: document.getElementById( 'vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+    } );
+
+    mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh)
 
     renderer = new THREE.WebGLRenderer();
 
@@ -66,14 +68,11 @@ function init() {
     container.appendChild( stats.dom );
 
     window.addEventListener( 'resize', onWindowResize, false );
-	
+
     // Controls
-    // var orientationControls= new THREE.DeviceOrientationControls( camera );
-    // controls = new THREE.OrbitControls( camera );
-    // controls.target.set( 0, 0, 0 );
-    // controls.update();
-	
-	window.addEventListener('mousemove', onMouseMove, false);
+    controls = new THREE.DeviceOrientationControls( camera );
+
+    window.addEventListener('mousemove', onMouseMove, false);
 }
 
 function onWindowResize( event ) {
@@ -85,28 +84,36 @@ function onWindowResize( event ) {
 
 // Follows the mouse event
 function onMouseMove(event) {
-	// Update the mouse variable
-	event.preventDefault();
-	mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-	mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-	mouse.x *= 400.0;
-	mouse.y *= 400.0;
+    // Update the mouse variable
+    event.preventDefault();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+    mouse.x *= 400.0;
+    mouse.y *= 400.0;
+
 }
 
 function animate() {
     requestAnimationFrame( animate );
     render();
     stats.update();
+
+    controls.update();
+
+    var time = performance.now();
+    mesh.material.uniforms.time.value = time * 0.005;
+    mesh.material.uniforms.center_x.value = mouse.x;
+    mesh.material.uniforms.center_y.value = mouse.y;
+
+    // Should do stuff like this with a wrapper around <if key pressed> b/c that'd be useful for debugging!
+    console.log(camera.rotation);
+    console.log(camera.up);
+
 }
 
 
 
 function render() {
-    var time = performance.now();
-	
-	mesh.material.uniforms.time.value = time * 0.005;
-	mesh.material.uniforms.center_x.value = mouse.x;
-	mesh.material.uniforms.center_y.value = ((-time*.004) % 5.0)*500.0+1500.0;
     if (guiData.stereo) {
         effect.render( scene, camera );
     } else {

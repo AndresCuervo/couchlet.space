@@ -15,7 +15,7 @@ display: π1p
 
 <script id="vertexShader" type="x-shader/x-vertex">
 	varying float depth;
-	varying float z_coord;
+	varying vec3 v_pos;
 	uniform float center_x;
 	uniform float center_y;
 	uniform float time;
@@ -30,21 +30,27 @@ display: π1p
 		vec4 cs_pos = projectionMatrix * modelViewMatrix * vec4( vertex, 1.0 );
 		depth = cs_pos.z * .001;
 		
-		z_coord = vertex.x;
+		v_pos = vertex;
 		gl_Position = cs_pos;
 	}
 </script>
 
 <script id="fragmentShader" type="x-shader/x-fragment">
 	varying float depth;
-	varying float z_coord;
+	varying vec3 v_pos;
 	uniform float time;
 	
 	void main() {
 		float proportion = (sin(time*.01)+1.0)*2.5+5.0;
 		float speed = 4.0;
-		float shit = step(mod(z_coord+time*speed, proportion), 1.0);
+		float shit = step(mod(v_pos.z+time*speed, proportion), 1.0);
+
 		float c = shit;
+
+        if (v_pos.z < 10.0){
+            c = 0.0;
+        }
+
 		gl_FragColor = vec4(c,c,c,1.);
 
 	}
