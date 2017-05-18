@@ -12,233 +12,263 @@ var bloomPass, renderScene;
 var composer;
 
 var params = {
-	projection: 'normal',
-	background: false,
-	exposure: 1.0,
-	bloomStrength: 1.5,
-	bloomThreshold: 0.85,
-	bloomRadius: 0.4
+    projection: 'normal',
+    background: false,
+    exposure: 1.0,
+    bloomStrength: 1.5,
+    bloomThreshold: 0.85,
+    bloomRadius: 0.4,
+    debug : true && (localStorage.debug == "true")
 };
 
 var mouse = {x: 0, y: 0};
 
-var info = (new ShowInfo).showInfo({
-    'debug' : true, // Cool, so you can set this to change the default, and also it'll remember (in localStorage) your choice!
-    'hello' : false
-});
+// Alternatively, just don't draw this and add it as a thing to the gui!
 
+// var info = (new ShowInfo).showInfo({
+//     'debug' : true, // Cool, so you can set this to change the default, and also it'll remember (in localStorage) your choice!
+//     'hello' : false
+// });
+//
+// // var info = {'debug' : true };
+//
+// var info = params; // if this works TODO replace that with this.
 
 init();
 animate();
 
 function tree_maker(center, light_color){
-	var size = .04;
-	var geometry = new THREE.BoxBufferGeometry( size, size, size );
+    var size = .04;
+    var geometry = new THREE.BoxBufferGeometry( size, size, size );
 
-	var colors = [];
+    var colors = [];
 
-	for ( var i = 0, l = geometry.attributes.position.count; i < l; i ++ ) {
-		colors.push(light_color.r + (Math.random()*.1 - 0.05),
-					light_color.g + (Math.random()*.1 - 0.05),
-					light_color.b + (Math.random()*.1 - 0.05));
-	}
+    for ( var i = 0, l = geometry.attributes.position.count; i < l; i ++ ) {
+        colors.push(light_color.r + (Math.random()*.1 - 0.05),
+            light_color.g + (Math.random()*.1 - 0.05),
+            light_color.b + (Math.random()*.1 - 0.05));
+    }
 
-	geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+    geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-	var material = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: THREE.VertexColors } );
+    var material = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: THREE.VertexColors } );
 
-	var mesh = new THREE.Mesh( geometry, material );
+    var mesh = new THREE.Mesh( geometry, material );
 
-	var INSTANCE_COUNT = 30;
-	var HEIGHT = 100;
-	var PER_HEIGHT = .5;
-	var NOISE_SCALE = .03;
-	var NOISE_DISPLACEMENT = .5;
-	
-	var START_RAD = .5;
-	var END_RAD = 0.1;
+    var INSTANCE_COUNT = 30;
+    var HEIGHT = 100;
+    var PER_HEIGHT = .5;
+    var NOISE_SCALE = .03;
+    var NOISE_DISPLACEMENT = .5;
 
-	var geometry2 = new THREE.InstancedBufferGeometry().copy( geometry );
+    var START_RAD = .5;
+    var END_RAD = 0.1;
 
-	var instancePositions = [];
-	var instanceQuaternions = [];
-	var instanceScales = [];
-	
-	noise.seed(Math.random());
-	
-	var trunk = new THREE.Geometry();
-	
-	var TOTAL_INSTANCES = INSTANCE_COUNT * HEIGHT;
+    var geometry2 = new THREE.InstancedBufferGeometry().copy( geometry );
 
-	for ( var i = 0; i < TOTAL_INSTANCES; i ++ ) {
+    var instancePositions = [];
+    var instanceQuaternions = [];
+    var instanceScales = [];
 
-		var mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
+    noise.seed(Math.random());
 
-		var position = mesh.position;
+    var trunk = new THREE.Geometry();
 
-		var quaternion = mesh.quaternion;
-		var scale = mesh.scale;
-		
-		var cur_radius = (1.0 - i/TOTAL_INSTANCES)*START_RAD + (i/TOTAL_INSTANCES)*END_RAD;
-		
-		var radians = Math.PI * 2.0 * (i % INSTANCE_COUNT) / INSTANCE_COUNT;
-		position.set( Math.cos(radians)*cur_radius, Math.sin(radians)*cur_radius, -PER_HEIGHT*i / INSTANCE_COUNT);
-		var nx = noise.simplex3(position.x*NOISE_SCALE, position.y*NOISE_SCALE, position.z*NOISE_SCALE);
-		var ny = noise.simplex3(
-					(position.x+1000.0)*NOISE_SCALE, 
-					(position.y+1000.0)*NOISE_SCALE, 
-					(position.z+1000.0)*NOISE_SCALE);
-		var nz = noise.simplex3(
-					(position.x+2000.0)*NOISE_SCALE, 
-					(position.y+2000.0)*NOISE_SCALE, 
-					(position.z+2000.0)*NOISE_SCALE);
-		
-		position.x += nx*NOISE_DISPLACEMENT + Math.random()*.05;
-		position.y += ny*NOISE_DISPLACEMENT + Math.random()*.05;
-		position.z += nz*NOISE_DISPLACEMENT + Math.random()*.05;
-		
-		position.x += center.x;
-		position.y += center.y;
-		position.z += center.z;
-		
-		trunk.vertices.push(position);
-		
-		if (i > INSTANCE_COUNT){
-			trunk.faces.push(new THREE.Face3(i, i-INSTANCE_COUNT+1, i-INSTANCE_COUNT));
-			trunk.faces.push(new THREE.Face3(i, i-INSTANCE_COUNT, i-1));
-		}
+    var TOTAL_INSTANCES = INSTANCE_COUNT * HEIGHT;
 
-		quaternion.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
-		quaternion.normalize();
+    for ( var i = 0; i < TOTAL_INSTANCES; i ++ ) {
 
-		//scale.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+        var mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
 
-		instancePositions.push( position.x, position.y, position.z );
-		instanceQuaternions.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
-		//instanceScales.push( scale.x, scale.y, scale.z );
-	}
-	
-	var material = new THREE.MeshBasicMaterial( { color: 0x020810} );
-	tree_trunk = new THREE.Mesh(trunk, material);
-	scene.add(tree_trunk);
+        var position = mesh.position;
 
-	var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 );
-	geometry2.addAttribute( 'instancePosition', attribute );
-	
-	/*
-	var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 );
-	lights.addAttribute( 'instanceQuaternion', attribute );
+        var quaternion = mesh.quaternion;
+        var scale = mesh.scale;
 
-	var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 );
-	lights.addAttribute( 'instanceScale', attribute );
-*/
-	var material = new THREE.ShaderMaterial( {
+        var cur_radius = (1.0 - i/TOTAL_INSTANCES)*START_RAD + (i/TOTAL_INSTANCES)*END_RAD;
 
-		uniforms: {},
-		vertexShader: document.getElementById( 'vertexShader' ).textContent,
-		fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+        var radians = Math.PI * 2.0 * (i % INSTANCE_COUNT) / INSTANCE_COUNT;
+        position.set( Math.cos(radians)*cur_radius, Math.sin(radians)*cur_radius, -PER_HEIGHT*i / INSTANCE_COUNT);
+        var nx = noise.simplex3(position.x*NOISE_SCALE, position.y*NOISE_SCALE, position.z*NOISE_SCALE);
+        var ny = noise.simplex3(
+            (position.x+1000.0)*NOISE_SCALE, 
+            (position.y+1000.0)*NOISE_SCALE, 
+            (position.z+1000.0)*NOISE_SCALE);
+        var nz = noise.simplex3(
+            (position.x+2000.0)*NOISE_SCALE, 
+            (position.y+2000.0)*NOISE_SCALE, 
+            (position.z+2000.0)*NOISE_SCALE);
 
-	} );
+        position.x += nx*NOISE_DISPLACEMENT + Math.random()*.05;
+        position.y += ny*NOISE_DISPLACEMENT + Math.random()*.05;
+        position.z += nz*NOISE_DISPLACEMENT + Math.random()*.05;
 
-	lights = new THREE.Mesh( geometry2, material );
-	//mesh2.position.x = 0.1;
-	scene.add( lights );
-	
-	
+        position.x += center.x;
+        position.y += center.y;
+        position.z += center.z;
+
+        trunk.vertices.push(position);
+
+        if (i > INSTANCE_COUNT){
+            trunk.faces.push(new THREE.Face3(i, i-INSTANCE_COUNT+1, i-INSTANCE_COUNT));
+            trunk.faces.push(new THREE.Face3(i, i-INSTANCE_COUNT, i-1));
+        }
+
+        quaternion.set( Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1 );
+        quaternion.normalize();
+
+        //scale.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+
+        instancePositions.push( position.x, position.y, position.z );
+        instanceQuaternions.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
+        //instanceScales.push( scale.x, scale.y, scale.z );
+    }
+
+    var material = new THREE.MeshBasicMaterial( { color: 0x020810} );
+    tree_trunk = new THREE.Mesh(trunk, material);
+    scene.add(tree_trunk);
+
+    var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instancePositions ), 3 );
+    geometry2.addAttribute( 'instancePosition', attribute );
+
+    /*
+    var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instanceQuaternions ), 4 );
+    lights.addAttribute( 'instanceQuaternion', attribute );
+
+    var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 );
+    lights.addAttribute( 'instanceScale', attribute );
+    */
+    var material = new THREE.ShaderMaterial( {
+
+        uniforms: {},
+        vertexShader: document.getElementById( 'vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+    } );
+
+    lights = new THREE.Mesh( geometry2, material );
+    //mesh2.position.x = 0.1;
+    scene.add( lights );
+
+
 }
 
 function init() {
 
-	container = document.getElementById( 'container' );
+    container = document.getElementById( 'container' );
 
-	camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
-	camera.position.z = 20;
-
-
-	scene = new THREE.Scene();
-
-	var colors = [	new THREE.Color( 0x7ec8c8 ),
-					new THREE.Color( 0xcc86d7 ),
-					new THREE.Color( 0xd9cde4 ),
-					new THREE.Color( 0xadc7c7 )]
-	
-	var tree_count = 0;
-	for (var i=0; i<10; i++){
-	// for (var i=-10; i<11; i += 20){
-	// 	for (var j=-15; j<16; j+= 30){
-			//tree_maker(new THREE.Vector3(j, i, 0), colors[tree_count % colors.length]);
-			tree_maker(new THREE.Vector3((Math.random()-.5)*10.0,(Math.random()-.5)*10.0,0),
-				colors[tree_count % colors.length]);
-			tree_count++;
-	// 	}
-	// }
-	}
-	
-	renderer = new THREE.WebGLRenderer();
-
-	if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
-		document.getElementById( "notSupported" ).style.display = "";
-		return;
-	}
-
-	renderer.setClearColor( 0x090909 );
-	renderer.toneMapping = THREE.LinearToneMapping;
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	container.appendChild( renderer.domElement );
-
-	
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+    camera.position.z = 20;
 
 
-	
-	renderScene = new THREE.RenderPass(scene, camera);
-	
+    scene = new THREE.Scene();
+
+    var colors = [	new THREE.Color( 0x7ec8c8 ),
+        new THREE.Color( 0xcc86d7 ),
+        new THREE.Color( 0xd9cde4 ),
+        new THREE.Color( 0xadc7c7 )]
+
+    var tree_count = 0;
+    for (var i=0; i<10; i++){
+        // for (var i=-10; i<11; i += 20){
+        // 	for (var j=-15; j<16; j+= 30){
+        //tree_maker(new THREE.Vector3(j, i, 0), colors[tree_count % colors.length]);
+        tree_maker(new THREE.Vector3((Math.random()-.5)*10.0,(Math.random()-.5)*10.0,0),
+            colors[tree_count % colors.length]);
+        tree_count++;
+        // 	}
+        // }
+    }
+
+    renderer = new THREE.WebGLRenderer();
+
+    if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === false ) {
+        document.getElementById( "notSupported" ).style.display = "";
+        return;
+    }
+
+    renderer.setClearColor( 0x090909 );
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    container.appendChild( renderer.domElement );
+
+    renderScene = new THREE.RenderPass(scene, camera);
+
     effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
     effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
-	var copyShader = new THREE.ShaderPass(THREE.CopyShader);
-	copyShader.renderToScreen = true;
+    var copyShader = new THREE.ShaderPass(THREE.CopyShader);
+    copyShader.renderToScreen = true;
     bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), .8, 0.2, 0.4);//1.0, 9, 0.5, 512);
-	composer = new THREE.EffectComposer(renderer);
+    composer = new THREE.EffectComposer(renderer);
     composer.setSize(window.innerWidth, window.innerHeight);
     composer.addPass(renderScene);
-	composer.addPass(effectFXAA);
+    composer.addPass(effectFXAA);
     composer.addPass(bloomPass);
-	composer.addPass(copyShader);
-		//renderer.toneMapping = THREE.ReinhardToneMapping;
-	renderer.gammaInput = true;
-	renderer.gammaOutput = true;
-	
-	
-	
-	if (info.debug){
-		stats = new Stats();
-		container.appendChild( stats.dom );
-		var gui = new dat.GUI();
-		gui.add( params, 'exposure', 0.1, 2 );
-		gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function(value) {
-	    	bloomPass.threshold = Number(value);
-		});
-		gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function(value) {
-	    	bloomPass.strength = Number(value);
-		});
-		gui.add( params, 'bloomRadius', 0.0, .1 ).onChange( function(value) {
-	    	bloomPass.radius = Number(value);
-		});
-		gui.open();
-	}
-	
-	if (info.debug){
-    	// Controls
-	    var orientationControls= new THREE.DeviceOrientationControls( camera );
-	    controls = new THREE.OrbitControls( camera );
-	    controls.target.set( 0, 0, 0 );
-	    controls.update();
-}
-	camera.lookAt(new THREE.Vector3(0,0,0));
-	
-	window.addEventListener( 'resize', onWindowResize, false );
-	window.addEventListener('mousemove', onMouseMove, false);
+    composer.addPass(copyShader);
+    //renderer.toneMapping = THREE.ReinhardToneMapping;
+    renderer.gammaInput = true;
+    renderer.gammaOutput = true;
+
+
+    console.log("yo");
+    console.log("true", document.location.hostname !== "127.0.0.1" || document.location.hostname !== "localhost");
+
+    if (document.location.hostname !== "127.0.0.1" || document.location.hostname !== "localhost") {
+        var box = document.createElement('input');
+        var ID = "flashPoints";
+        console.log("box?");
+        console.log(box);
+        box.id= ID;
+        box.type = "checkbox";
+        box.style = "position: absolute; top: 1%; right: 10%; z-index: 2;";
+        box.onclick = function () {
+            localStorage.setItem( "debug", !(localStorage.getItem("debug") === 'true'));
+            console.log(localStorage.getItem("debug"));
+        };
+
+        if (("" + params.debug) !== 'true')
+            document.querySelector('body').appendChild(box);
+    }
+
+    if (params.debug){
+        stats = new Stats();
+        container.appendChild( stats.dom );
+        var gui = new dat.GUI();
+        gui.add( params, 'exposure', 0.1, 2 );
+
+        gui.add( params, 'debug').onChange( function(value) {
+            if (value != null) {
+                localStorage.setItem("debug", value);
+                gui.save();
+            }
+        })
+
+        gui.add( params, 'bloomThreshold', 0.0, 1.0 ).onChange( function(value) {
+            bloomPass.threshold = Number(value);
+        });
+        gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function(value) {
+            bloomPass.strength = Number(value);
+        });
+        gui.add( params, 'bloomRadius', 0.0, .1 ).onChange( function(value) {
+            bloomPass.radius = Number(value);
+        });
+        gui.open();
+        gui.remember(params);
+    }
+
+    if (params.debug){
+        // Controls
+        var orientationControls= new THREE.DeviceOrientationControls( camera );
+        controls = new THREE.OrbitControls( camera );
+        controls.target.set( 0, 0, 0 );
+        controls.update();
+    }
+    camera.lookAt(new THREE.Vector3(0,0,0));
+
+    window.addEventListener( 'resize', onWindowResize, false );
+    window.addEventListener('mousemove', onMouseMove, false);
 }
 
 // Follows the mouse event
@@ -265,30 +295,30 @@ function onMouseMove(event) {
 
 
 function onWindowResize( event ) {
-	camera.aspect = window.innerWidth / window.innerHeight;
-	camera.updateProjectionMatrix();
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	composer.setSize( width, height );
-					effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    composer.setSize( width, height );
+    effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
 }
 
 function animate() {
-	requestAnimationFrame( animate );
-	camera.position.x = mouse.x;
-	camera.position.y = mouse.y;
-	camera.lookAt(new THREE.Vector3(0,0,-20));
-	render();
-	if (info.debug){
-		stats.update();
-		controls.update();
-	}
+    requestAnimationFrame( animate );
+    camera.position.x = mouse.x;
+    camera.position.y = mouse.y;
+    camera.lookAt(new THREE.Vector3(0,0,-20));
+    render();
+    if (params.debug){
+        stats.update();
+        controls.update();
+    }
 }
 
 function render() {
-	var time = performance.now();
-	renderer.toneMappingExposure = Math.pow( params.exposure, 50.0 );
-	//renderer.render( scene, camera );
-	composer.render();
+    var time = performance.now();
+    renderer.toneMappingExposure = Math.pow( params.exposure, 50.0 );
+    //renderer.render( scene, camera );
+    composer.render();
 
 }

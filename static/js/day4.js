@@ -114,14 +114,14 @@ function loaderGuts(plyLoader){
 }
 
 function init() {
-	gui.add( guiData, "stereo");
-	gui.add( guiData, "range", 0, 1 );
+    gui.add( guiData, "stereo");
+    gui.add( guiData, "range", 0, 1 );
     container = document.getElementById( 'container' );
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
     camera.position.z = 2;
 
     scene = new THREE.Scene();
-	
+
     var loader = new THREE.PLYLoader();
     loader.load( '../assets/models/apse-simple.ply', loaderGuts);
 
