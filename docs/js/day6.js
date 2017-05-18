@@ -5,17 +5,30 @@ var camera, scene, renderer, effect;
 var mesh;
 
 var controls;
+
+var gyroPresent = false;
 var gui = new dat.GUI();
+
+var gyroOn;
 
 var orientation = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
 var guiData = {
-    'stereo' : false
+    'stereo' : false,
+    'printVars' : function() {
+        console.log(controls.deviceOrientation.alpha);
+        console.log(controls.deviceOrientation.alpha != null);
+        console.log("gyroPresent: ");
+        console.log(gyroPresent);
+        console.log("gyroOn: ");
+        console.log(gyroOn);
+    },
 };
 
 var mouse = {x: 0, y: 0};
 
 function init() {
     gui.add( guiData, "stereo");
+
     container = document.getElementById( 'container' );
     camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
     camera.position.x = 0;
@@ -25,9 +38,8 @@ function init() {
     camera.lookAt(new THREE.Vector3(0,0,0));
     // camera.position.z = 60;
 
-
     scene = new THREE.Scene();
-    scene.background = new THREE.Color( 0xbbaaee );
+    scene.background = new THREE.Color( 0x000000 );
 
     // geometry
     var geometry = new THREE.PlaneGeometry(2500, 2500, 500, 500);
@@ -69,10 +81,23 @@ function init() {
 
     window.addEventListener( 'resize', onWindowResize, false );
 
-    // Controls
     controls = new THREE.DeviceOrientationControls( camera );
 
+    overrideGyro = true;
+    gyroOn = overrideGyro && (controls.deviceOrientation.alpha != null);
+
+    if (gyroOn) {
+        // on
+    } else {
+        // off
+        console.log("gyro off, turning off controls");
+        // controls.enabled = false;
+    }
+
     window.addEventListener('mousemove', onMouseMove, false);
+
+
+    gui.add(guiData, 'printVars');
 }
 
 function onWindowResize( event ) {
@@ -98,6 +123,11 @@ function animate() {
     render();
     stats.update();
 
+    // if (controls.deviceOrientation.alpha != null) {
+    //     controls.enabled;
+    // }
+
+    controls.enabled = controls.deviceOrientation.alpha != null;
     controls.update();
 
     var time = performance.now();
@@ -106,9 +136,8 @@ function animate() {
     mesh.material.uniforms.center_y.value = mouse.y;
 
     // Should do stuff like this with a wrapper around <if key pressed> b/c that'd be useful for debugging!
-    console.log(camera.rotation);
-    console.log(camera.up);
-
+    // console.log(camera.rotation.x);
+    // console.log(controls.deviceOrientation);
 }
 
 
@@ -120,8 +149,17 @@ function render() {
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.render( scene, camera );
     }
+    // console.log(camera.rotation);
+    // console.log(controls);
 }
 
 
-init();
-animate();
+window.onload = function() {
+    init();
+    animate();
+}
+
+window.addEventListener("devicemotion", function(event){
+    if(event.rotationRate.alpha || event.rotationRate.beta || event.rotationRate.gamma)
+        gyroPresent = true;
+});
