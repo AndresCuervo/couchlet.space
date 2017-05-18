@@ -22,7 +22,11 @@ var params = {
 
 var mouse = {x: 0, y: 0};
 
-var debug = false;
+var info = (new ShowInfo).showInfo({
+    'debug' : true, // Cool, so you can set this to change the default, and also it'll remember (in localStorage) your choice!
+    'hello' : false
+});
+
 
 init();
 animate();
@@ -207,7 +211,7 @@ function init() {
 	
 	
 	
-	if (debug){
+	if (info.debug){
 		stats = new Stats();
 		container.appendChild( stats.dom );
 		var gui = new dat.GUI();
@@ -224,7 +228,7 @@ function init() {
 		gui.open();
 	}
 	
-	if (debug){
+	if (info.debug){
     	// Controls
 	    var orientationControls= new THREE.DeviceOrientationControls( camera );
 	    controls = new THREE.OrbitControls( camera );
@@ -275,7 +279,7 @@ function animate() {
 	camera.position.y = mouse.y;
 	camera.lookAt(new THREE.Vector3(0,0,-20));
 	render();
-	if (debug){
+	if (info.debug){
 		stats.update();
 		controls.update();
 	}
