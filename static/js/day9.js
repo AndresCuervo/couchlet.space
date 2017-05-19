@@ -5,6 +5,7 @@ var container, stats;
 var camera, scene, renderer;
 
 var controls;
+var material;
 
 var tree_trunk, lights;
 
@@ -17,9 +18,9 @@ var params = {
     projection: 'normal',
     background: false,
     exposure: 1.0,
-    bloomStrength: 1.5,
-    bloomThreshold: 0.85,
-    bloomRadius: 0.4,
+    bloomStrength: 1.9,
+    bloomThreshold: 0.063,
+    bloomRadius: 0.063,
 
     'printVars' : function() {
         console.log("gyroPresent: ");
@@ -50,8 +51,8 @@ function tree_maker(center, light_color){
     var mesh = new THREE.Mesh( geometry, material );
 
     var INSTANCE_COUNT = 30;
-    var HEIGHT = 100;
-    var PER_HEIGHT = .5;
+    var HEIGHT = 30;
+    var PER_HEIGHT = 1.0;
     var NOISE_SCALE = .03;
     var NOISE_DISPLACEMENT = .5;
 
@@ -83,7 +84,7 @@ function tree_maker(center, light_color){
         var cur_radius = (1.0 - i/TOTAL_INSTANCES)*START_RAD + (i/TOTAL_INSTANCES)*END_RAD;
 
         var radians = Math.PI * 2.0 * (i % INSTANCE_COUNT) / INSTANCE_COUNT;
-        position.set( Math.cos(radians)*cur_radius, Math.sin(radians)*cur_radius, -PER_HEIGHT*i / INSTANCE_COUNT);
+        position.set( Math.cos(radians)*cur_radius, PER_HEIGHT*i / INSTANCE_COUNT, Math.sin(radians)*cur_radius);
         var nx = noise.simplex3(position.x*NOISE_SCALE, position.y*NOISE_SCALE, position.z*NOISE_SCALE);
         var ny = noise.simplex3(
             (position.x+1000.0)*NOISE_SCALE, 
@@ -133,49 +134,66 @@ function tree_maker(center, light_color){
     var attribute = new THREE.InstancedBufferAttribute( new Float32Array( instanceScales ), 3 );
     lights.addAttribute( 'instanceScale', attribute );
     */
-    var material = new THREE.ShaderMaterial( {
-
-        uniforms: {},
-        vertexShader: document.getElementById( 'vertexShader' ).textContent,
-        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-
-    } );
+    // var material = new THREE.ShaderMaterial( {
+    //
+    //     uniforms: {},
+    //     vertexShader: document.getElementById( 'vertexShader' ).textContent,
+    //     fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+    //
+    // } );
+    
+    var material = new THREE.MeshBasicMaterial( { color: 0xffffff} );
 
     lights = new THREE.Mesh( geometry2, material );
-    //mesh2.position.x = 0.1;
     scene.add( lights );
 
+}
 
+function starMaker () {
+    geometry = new THREE.InstancedBufferGeometry();
+    geometry.copy( new THREE.CircleBufferGeometry( 1, 6 ) );
+
+    var particleCount = 10000;
+
+    var translateArray = new Float32Array( particleCount * 3 );
+
+    for ( var i = 0, i3 = 0, l = particleCount; i < l; i ++, i3 += 3 ) {
+
+        translateArray[ i3 + 0 ] = Math.random() * 2 - 1;
+        translateArray[ i3 + 1 ] = Math.random() * 2 - 1;
+        translateArray[ i3 + 2 ] = Math.random() * 2 - 1;
+
+    }
+
+    geometry.addAttribute( "translate", new THREE.InstancedBufferAttribute( translateArray, 3, 1 ) );
+
+    material = new THREE.RawShaderMaterial( {
+        uniforms: {
+            map: { value: new THREE.TextureLoader().load( "../textures/spark.png" ) },
+            time: { value: 0.0 }
+        },
+        vertexShader: document.getElementById( 'vshader' ).textContent,
+        fragmentShader: document.getElementById( 'fshader' ).textContent,
+        depthTest: true,
+        depthWrite: true
+    } );
+
+    mesh = new THREE.Mesh( geometry, material );
+    mesh.scale.set( 50, 50, 50 );
+    scene.add( mesh );
 }
 
 function init() {
 
     container = document.getElementById( 'container' );
 
-    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100 );
+    camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 100000 );
     camera.position.z = 20;
 
 
     scene = new THREE.Scene();
 
-    var colors = [	new THREE.Color( 0x7ec8c8 ),
-        new THREE.Color( 0xcc86d7 ),
-        new THREE.Color( 0xd9cde4 ),
-        new THREE.Color( 0xadc7c7 )]
-
-    var tree_count = 0;
-    var POP = 3;
-
-    for (var i=0; i < POP; i++){
-        // for (var i=-10; i<11; i += 20){
-        // 	for (var j=-15; j<16; j+= 30){
-        //tree_maker(new THREE.Vector3(j, i, 0), colors[tree_count % colors.length]);
-        tree_maker(new THREE.Vector3((Math.random()-.5)*10.0,(Math.random()-.5)*10.0,0),
-            colors[tree_count % colors.length]);
-        tree_count++;
-        // 	}
-        // }
-    }
+    starMaker();
 
     renderer = new THREE.WebGLRenderer();
 
@@ -190,17 +208,13 @@ function init() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     container.appendChild( renderer.domElement );
 
-
-
-
-
     renderScene = new THREE.RenderPass(scene, camera);
 
     effectFXAA = new THREE.ShaderPass(THREE.FXAAShader);
     effectFXAA.uniforms['resolution'].value.set(1 / window.innerWidth, 1 / window.innerHeight );
     var copyShader = new THREE.ShaderPass(THREE.CopyShader);
     copyShader.renderToScreen = true;
-    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), .8, 0.2, 0.4);//1.0, 9, 0.5, 512);
+    bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), params.bloomStrength,params.bloomRadius, params.bloomThreshold);//1.0, 9, 0.5, 512);
     composer = new THREE.EffectComposer(renderer);
     composer.setSize(window.innerWidth, window.innerHeight);
     composer.addPass(renderScene);
@@ -212,6 +226,24 @@ function init() {
     renderer.gammaOutput = true;
 
 
+    var tree_count = 0;
+    var POP = 10;
+
+    var colors = [	new THREE.Color( 0x7ec8c8 ),
+        new THREE.Color( 0xcc86d7 ),
+        new THREE.Color( 0xd9cde4 ),
+        new THREE.Color( 0xadc7c7 )]
+        
+    for (var i=0; i < POP; i++){
+        // for (var i=-10; i<11; i += 20){
+        // 	for (var j=-15; j<16; j+= 30){
+        //tree_maker(new THREE.Vector3(j, i, 0), colors[tree_count % colors.length]);
+        tree_maker(new THREE.Vector3((Math.random()-.5)*40,-15, (Math.random()-.5)*40),
+            colors[tree_count % colors.length]);
+        tree_count++;
+        // 	}
+        // }
+    }
 
     if (debug){
         stats = new Stats();
@@ -224,7 +256,7 @@ function init() {
         gui.add( params, 'bloomStrength', 0.0, 3.0 ).onChange( function(value) {
             bloomPass.strength = Number(value);
         });
-        gui.add( params, 'bloomRadius', 0.0, .1 ).onChange( function(value) {
+        gui.add( params, 'bloomRadius', 0.0, 3 ).onChange( function(value) {
             bloomPass.radius = Number(value);
         });
         gui.open();
@@ -235,13 +267,24 @@ function init() {
     // controls.target.set( 0, 0, 0 );
     // controls.update();
 
-    controls.enabled = gyroPresent;
-    var note = "controls is: "
-    console.log(note, gyroPresent);
+    // controls.enabled = gyroPresent;
+    // var note = "controls is: "
+    // console.log(note, gyroPresent);
 
     if (gyroPresent){
         // Do gyro stuff!
     }
+
+    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+    controls.keys = [ 65, 83, 68 ];
+
 
     camera.lookAt(new THREE.Vector3(0,0,0));
 
@@ -251,6 +294,13 @@ function init() {
     if (debug) {
         gui.add(params, 'printVars');
     }
+    var material = new THREE.MeshBasicMaterial( { color: 0x020102} );
+    var object = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000, 4, 4 ), material );
+    
+    object.rotation.z = Math.PI/2.0;
+    object.rotation.x = -Math.PI/2.0;
+    object.position.set( 0, -10, 0 );
+    scene.add( object );
 }
 
 // Follows the mouse event
@@ -288,12 +338,6 @@ function onWindowResize( event ) {
 function animate() {
     requestAnimationFrame( animate );
 
-    if (!gyroPresent) {
-        camera.position.x = mouse.x;
-        camera.position.y = mouse.y;
-        camera.lookAt(new THREE.Vector3(0,0,-20));
-    }
-
     render();
 
     if (debug){
@@ -305,6 +349,13 @@ function animate() {
 
 function render() {
     var time = performance.now();
+    
+    camera.position.x = Math.sin(time*.00001)*20;
+    camera.position.z = Math.cos(time*.00001)*20;
+    camera.lookAt(new THREE.Vector3(0,0,0));
+
+    material.uniforms.time.value = time;
+
     renderer.toneMappingExposure = Math.pow( params.exposure, 50.0 );
     //renderer.render( scene, camera );
     composer.render();
@@ -325,4 +376,5 @@ window.onload = function() {
     init();
     animate();
 }
+
 

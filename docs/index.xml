@@ -83,5 +83,14 @@
       <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.</description>
     </item>
     
+    <item>
+      <title>05.19.2017</title>
+      <link>https://andrescuervo.github.io/twentyfourseven/day9/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://andrescuervo.github.io/twentyfourseven/day9/</guid>
+      <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.</description>
+    </item>
+    
   </channel>
 </rss>
