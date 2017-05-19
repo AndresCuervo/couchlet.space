@@ -164,7 +164,7 @@ function init() {
         new THREE.Color( 0xadc7c7 )]
 
     var tree_count = 0;
-    const POP = true ? 3 : 10;
+    var POP = true ? 3 : 10;
 
     for (var i=0; i < POP; i++){
         // for (var i=-10; i<11; i += 20){
