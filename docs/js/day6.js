@@ -9,18 +9,12 @@ var controls;
 var gyroPresent = false;
 var gui = new dat.GUI();
 
-var gyroOn;
-
 var orientation = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, .01, 1000000 );
 var guiData = {
     'stereo' : false,
     'printVars' : function() {
-        console.log(controls.deviceOrientation.alpha);
-        console.log(controls.deviceOrientation.alpha != null);
         console.log("gyroPresent: ");
         console.log(gyroPresent);
-        console.log("gyroOn: ");
-        console.log(gyroOn);
     },
 };
 
@@ -83,16 +77,9 @@ function init() {
 
     controls = new THREE.DeviceOrientationControls( camera );
 
-    overrideGyro = true;
-    gyroOn = overrideGyro && (controls.deviceOrientation.alpha != null);
-
-    if (gyroOn) {
-        // on
-    } else {
-        // off
-        console.log("gyro off, turning off controls");
-        // controls.enabled = false;
-    }
+    controls.enabled = gyroPresent;
+    var note = "controls is is: "
+    console.log(note, gyroPresent);
 
     window.addEventListener('mousemove', onMouseMove, false);
 
@@ -121,6 +108,7 @@ function onMouseMove(event) {
 function animate() {
     requestAnimationFrame( animate );
     render();
+
     stats.update();
 
     // if (controls.deviceOrientation.alpha != null) {
@@ -159,7 +147,9 @@ window.onload = function() {
     animate();
 }
 
+// replace with addDeviceMotionListener from utils/orientation.js ????
 window.addEventListener("devicemotion", function(event){
-    if(event.rotationRate.alpha || event.rotationRate.beta || event.rotationRate.gamma)
+    if (gyroPresent !=  true && (event.rotationRate.alpha || event.rotationRate.beta || event.rotationRate.gamma)) {
         gyroPresent = true;
+    }
 });

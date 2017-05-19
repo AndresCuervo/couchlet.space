@@ -3,15 +3,15 @@ title: 05.17.2017
 display: wisps
 ---
 <script src="../js/three.js"></script>
-<script src="../js/controls/OrbitControls.js"></script>
-<script src="../js/controls/DeviceOrientationControls.js"></script>
-
-<script src="../js/utils/dat.gui.min.js"></script>
-<script src="../js/loaders/PLYLoader.js"></script>
-<script src="../js/effects/StereoEffect.js"></script>
 
 <script src="../js/Detector.js"></script>
+<script src="../js/controls/DeviceOrientationControls.js"></script>
+<script src="../js/controls/OrbitControls.js"></script>
+<script src="../js/effects/StereoEffect.js"></script>
+<script src="../js/loaders/PLYLoader.js"></script>
 <script src="../js/stats.min.js"></script>
+<script src="../js/utils/dat.gui.min.js"></script>
+<script src="../js/utils/orientation.js"></script>
 
 <script id="vertexShader" type="x-shader/x-vertex">
 	varying float depth;
