@@ -13,7 +13,7 @@ body  {
 
 .list {
     list-style: none;
-    overflow: scroll;
+    /*overflow: scroll;*/
 }
 
 .list li {

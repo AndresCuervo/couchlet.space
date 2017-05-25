@@ -21,14 +21,15 @@
     <body class="li-body">
 
 
-<script src="../js/three.js"></script>
-<script src="../js/Detector.js"></script>
-<script src="../js/stats.min.js"></script>
+<script src="../js/three85.js"></script>
+<script src="../js/utils/Detector.js"></script>
+<script src="../js/utils/stats.min.js"></script>
 <script src="../js/loaders/PLYLoader.js"></script>
-
-<script type="text/javascript" src="../js/utils/dat.gui.min.js"></script>
+<script src="../js/utils/dat.gui.min.js"></script>
 
 <script src="../js/aframe/0.5.0/aframe.min.js"></script>
+<!-- This PLYLoader needs to be here again, maybe because aframe is stealing the global instance of three??? IDK -->
+<script src="../js/loaders/PLYLoader.js"></script>
 
 <p><div id="container">
 </div>
@@ -37,8 +38,7 @@
     <a-camera id="camera"></a-camera>
 </a-scene></p>
 
-<script src="../js/loaders/PLYLoader.js"></script>
-<script src="../js/TrackballControls.js"></script>
+<script src="../js/controls/TrackballControls.js"></script>
 <script src="../js/effects/AnaglyphEffect.js"></script>
 
 <script type="x-shader/x-vertex" id="vertexshader">
@@ -75,7 +75,7 @@
     }
 </script>
 
-<script src="../js/day3.js"></script>
+<script src="../js/scenes/day3.js"></script>
 
     <script type="text/javascript">
     <!--

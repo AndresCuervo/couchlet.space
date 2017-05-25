@@ -3,9 +3,8 @@ title: "05.11.2017"
 display: anaglyph
 ---
 
-<script src="../js/TrackballControls.js"></script>
+<script src="../js/controls/TrackballControls.js"></script>
 <script src="../js/effects/AnaglyphEffect.js"></script>
-<script src="../js/utils/dat.gui.min.js"></script>
 
 <script type="x-shader/x-vertex" id="vertexshader">
     attribute float size;
@@ -41,4 +40,4 @@ display: anaglyph
     }
 </script>
 
-<script src="../js/day2.js"></script>
+<script src="../js/scenes/day2.js"></script>

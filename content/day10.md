@@ -2,17 +2,13 @@
 title: 05.20.2017
 display: 🌅☭🌅
 ---
-<script src="../js/three.js"></script>
-
-<script src="../js/Detector.js"></script>
-<script src="../js/TrackballControls.js"></script>
 <script src="../js/controls/DeviceOrientationControls.js"></script>
 <script src="../js/controls/OrbitControls.js"></script>
 <script src="../js/effects/StereoEffect.js"></script>
 <script src="../js/loaders/PLYLoader.js"></script>
-<script src="../js/stats.min.js"></script>
-<script src="../js/utils/dat.gui.min.js"></script>
 <script src="../js/utils/orientation.js"></script>
+<script src="../js/controls/TrackballControls.js"></script>
+
 
 <script src="../js/utils/noise.js"></script>
 <script src="../js/postprocessing/EffectComposer.js"></script>
@@ -90,4 +86,4 @@ display: 🌅☭🌅
 
 <div id="container"></div>
 
-<script src="../js/day10.js"></script>
+<script src="../js/scenes/day10.js"></script>

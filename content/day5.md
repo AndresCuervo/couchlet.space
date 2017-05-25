@@ -2,17 +2,9 @@
 title: 05.14.2017
 display: lor3m
 ---
-<script src="../js/three.js"></script>
 <script src="../js/controls/OrbitControls.js"></script>
 <script src="../js/controls/DeviceOrientationControls.js"></script>
-
-
-<script src="../js/utils/dat.gui.min.js"></script>
-<script src="../js/loaders/PLYLoader.js"></script>
 <script src="../js/effects/StereoEffect.js"></script>
-
-<script src="../js/Detector.js"></script>
-<script src="../js/stats.min.js"></script>
 
 <script id="vertexShader" type="x-shader/x-vertex">
     precision highp float;
@@ -31,7 +23,6 @@ display: lor3m
 
     varying vec3 vPosition;
     varying vec4 vColor;
-    varying float distFromCenter;
 
     void main(){
         vPosition = 10.0*offset +  position;
@@ -41,7 +32,6 @@ display: lor3m
 
         vColor = color;
 
-        distFromCenter = length(position.xyz);
         gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.0 );
     }
 </script>
@@ -54,7 +44,6 @@ display: lor3m
 
     varying vec3 vPosition;
     varying vec4 vColor;
-    varying float distFromCenter;
 
     void main() {
 
@@ -65,4 +54,4 @@ display: lor3m
 
 <div id="container"></div>
 
-<script src="../js/day5.js"></script>
+<script src="../js/scenes/day5.js"></script>

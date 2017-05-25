@@ -2,7 +2,10 @@
 title: 05.12.2017
 display: (L) A P S E
 ---
+
 <script src="../js/aframe/0.5.0/aframe.min.js"></script>
+<!-- This PLYLoader needs to be here again, maybe because aframe is stealing the global instance of three??? IDK -->
+<script src="../js/loaders/PLYLoader.js"></script>
 
 <div id="container">
 </div>
@@ -11,8 +14,8 @@ display: (L) A P S E
     <a-camera id="camera"></a-camera>
 </a-scene>
 
-<script src="../js/loaders/PLYLoader.js"></script>
-<script src="../js/TrackballControls.js"></script>
+
+<script src="../js/controls/TrackballControls.js"></script>
 <script src="../js/effects/AnaglyphEffect.js"></script>
 
 <script type="x-shader/x-vertex" id="vertexshader">
@@ -49,4 +52,4 @@ display: (L) A P S E
     }
 </script>
 
-<script src="../js/day3.js"></script>
+<script src="../js/scenes/day3.js"></script>

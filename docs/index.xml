@@ -25,7 +25,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day2/</guid>
-      <description>   attribute float size; attribute vec3 customColor; varying vec3 vColor; void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_PointSize = size * ( 300.0 / -mvPosition.z ); gl_Position = projectionMatrix * mvPosition; }  uniform vec3 color; uniform sampler2D texture; varying vec3 vColor; void main() { gl_FragColor = vec4( color * vColor, 1.0 ); gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord ); }   </description>
+      <description>  attribute float size; attribute vec3 customColor; varying vec3 vColor; void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_PointSize = size * ( 300.0 / -mvPosition.z ); gl_Position = projectionMatrix * mvPosition; }  uniform vec3 color; uniform sampler2D texture; varying vec3 vColor; void main() { gl_FragColor = vec4( color * vColor, 1.0 ); gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord ); }   </description>
     </item>
     
     <item>
@@ -34,8 +34,8 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day3/</guid>
-      <description>    
-   attribute float size; attribute vec3 customColor; varying vec3 vColor; void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_PointSize = size * ( 300.0 / -mvPosition.z ); gl_Position = projectionMatrix * mvPosition; }  uniform vec3 color; uniform sampler2D texture; varying vec3 vColor; void main() { gl_FragColor = vec4( color * vColor, 1.0 ); gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord ); }   </description>
+      <description>     
+  attribute float size; attribute vec3 customColor; varying vec3 vColor; void main() { vColor = customColor; vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 ); gl_PointSize = size * ( 300.0 / -mvPosition.z ); gl_Position = projectionMatrix * mvPosition; }  uniform vec3 color; uniform sampler2D texture; varying vec3 vColor; void main() { gl_FragColor = vec4( color * vColor, 1.0 ); gl_FragColor = gl_FragColor * texture2D( texture, gl_PointCoord ); }   </description>
     </item>
     
     <item>
@@ -53,7 +53,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day5/</guid>
-      <description>precision highp float; uniform float sineTime; uniform float range; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; attribute vec3 position; attribute vec3 offset; attribute vec4 color; attribute vec4 orientationStart; attribute vec4 orientationEnd; varying vec3 vPosition; varying vec4 vColor; varying float distFromCenter; void main(){ vPosition = 10.0*offset + position; vec4 orientation = vec4(offset,1); vec3 vcV = cross(orientation.xyz, vPosition); vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.</description>
+      <description>precision highp float; uniform float sineTime; uniform float range; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; attribute vec3 position; attribute vec3 offset; attribute vec4 color; attribute vec4 orientationStart; attribute vec4 orientationEnd; varying vec3 vPosition; varying vec4 vColor; void main(){ vPosition = 10.0*offset + position; vec4 orientation = vec4(offset,1); vec3 vcV = cross(orientation.xyz, vPosition); vPosition = vcV * (2.0 * orientation.w) + (cross(orientation.xyz, vcV) * 2.0 + vPosition); vColor = color; gl_Position = projectionMatrix * modelViewMatrix * vec4( vPosition, 1.</description>
     </item>
     
     <item>
@@ -71,7 +71,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day7/</guid>
-      <description>varying float depth; varying vec3 v_pos; uniform float center_x; uniform float center_y; uniform float time; void main() { float scale = (sin(time*0.2)+1.0)*.01 + .004; float height = 200.0; vec3 vertex = position; vertex.z += exp(-(pow((vertex.x-center_x)*scale, 2.0) + pow((vertex.y-center_y)*scale, 2.0))) * height; vec4 cs_pos = projectionMatrix * modelViewMatrix * vec4( vertex, 1.0 ); depth = cs_pos.z * .001; v_pos = vertex; gl_Position = cs_pos; }  varying float depth; varying vec3 v_pos; uniform float time; void main() { float proportion = (sin(time*.</description>
+      <description>varying vec3 v_pos; uniform float center_x; uniform float center_y; uniform float time; void main() { float scale = (sin(time*0.2)+1.0)*.01 + .004; float height = 200.0; vec3 vertex = position; vertex.z += exp(-(pow((vertex.x-center_x)*scale, 2.0) + pow((vertex.y-center_y)*scale, 2.0))) * height; vec4 cs_pos = projectionMatrix * modelViewMatrix * vec4( vertex, 1.0 ); v_pos = vertex; gl_Position = cs_pos; }  varying vec3 v_pos; uniform float time; void main() { float proportion = (sin(time*.</description>
     </item>
     
     <item>
@@ -80,7 +80,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day8/</guid>
-      <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.</description>
+      <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.x + time,translate.y + time,translate.</description>
     </item>
     
     <item>
@@ -89,7 +89,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day9/</guid>
-      <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.</description>
+      <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.x + time,translate.y + time,translate.</description>
     </item>
     
     <item>
@@ -98,7 +98,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day10/</guid>
-      <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.</description>
+      <description>precision highp float; uniform mat4 modelViewMatrix; uniform mat4 projectionMatrix; uniform float time; attribute vec3 position; attribute vec2 uv; attribute vec3 translate; varying vec2 vUv; varying float vScale; float rand(vec2 co){ return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453); } void main() { vec4 mvPosition = modelViewMatrix * vec4( translate, 1.0 ); vec3 trTime = vec3(translate.x + time,translate.y + time,translate.</description>
     </item>
     
   </channel>
