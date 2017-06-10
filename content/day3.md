@@ -3,7 +3,7 @@ title: 05.12.2017
 display: (L) A P S E
 ---
 
-<script src="../js/aframe/0.5.0/aframe.min.js"></script>
+<script src="../js/a-frame/0.5.0/aframe.min.js"></script>
 <!-- This PLYLoader needs to be here again, maybe because aframe is stealing the global instance of three??? IDK -->
 <script src="../js/loaders/PLYLoader.js"></script>
 
