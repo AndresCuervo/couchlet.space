@@ -102,12 +102,12 @@
     </item>
     
     <item>
-      <title>Whoop</title>
+      <title>06.11.17</title>
       <link>https://andrescuervo.github.io/twentyfourseven/day11/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://andrescuervo.github.io/twentyfourseven/day11/</guid>
-      <description>                  </description>
+      <description>--    --    --    - var initialScale = &#34;0.01 0.01 0.01&#34; - each sound, i in [{src : &#34;https://andrescuervo.github.io/twentyfourseven/assets/sounds/woosh1.wav&#34;, dur : 250}, {src : &#34;https://andrescuervo.github.io/twentyfourseven/assets/sounds/woosh2.wav&#34;, dur : 1000}, {src : &#34;https://andrescuervo.github.io/twentyfourseven/assets/sounds/woosh3.wav&#34;, animTo : &#34;0.1 0 0&#34; }] a-entity(scale=initialScale position = (-4 + i * 3.5) + &#34; 0 &#34; + &#34;-4&#34; /* + (Math.tan(i) * 1.5)*/ material = &#34;side: double; color: #&#34;</description>
     </item>
     
   </channel>

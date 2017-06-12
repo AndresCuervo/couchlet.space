@@ -16,7 +16,7 @@ fi
 for var in "$@"
 do
     file_md="content/day${var}.md"
-    file_js="static/js/day${var}.js"
+    file_js="static/js/scenes/day${var}.js"
 
     for file in $file_md $file_js
     do
