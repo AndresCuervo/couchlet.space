@@ -1,5 +1,0 @@
-baseURL = "https://andrescuervo.github.io/twentyfourseven/"
-languageCode = "en-us"
-title = "᠅"
-publishDir = "docs"
-theme = "couchlet"

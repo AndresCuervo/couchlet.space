@@ -1,0 +1,15 @@
+body {
+    /* height: 360vh; */
+    height: 600vh;
+    background-color: black;
+}
+
+#scrollytelling {
+    /* width: 100%; */
+    width: 50%;
+    height: auto;
+    position: fixed;
+    /* left: -50%; */
+    left: 25%;
+    transform: rotateZ(0);
+}
